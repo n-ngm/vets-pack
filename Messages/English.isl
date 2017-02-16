@@ -1,0 +1,2 @@
+[CustomMessages]
+HelloWorld=Hello, World !
