@@ -72,12 +72,12 @@ AppendDefaultDirName=no
 
 [Languages]
 Name: japanese; \
-  MessagesFile: "compiler:\Languages\Japanese.isl,{__FILE__}\..\Messages\Japanese.isl"; \
-  InfoBeforeFile: "Files\README_JP.txt"
-                  
+    MessagesFile: "compiler:\Languages\Japanese.isl,{__FILE__}\..\Messages\Japanese.isl"; \
+    InfoBeforeFile: "Files\README_JP.txt"
+
 Name: english; \
-  MessagesFile: "compiler:Default.isl,{__FILE__}\..\Messages\English.isl"; \
-  InfoBeforeFile: "Files\README.txt"
+    MessagesFile: "compiler:Default.isl,{__FILE__}\..\Messages\English.isl"; \
+    InfoBeforeFile: "Files\README.txt"
 
 [Files]
 Source: "Files\*"; DestDir: "{app}"; Flags: isreadme ignoreversion touch
@@ -99,134 +99,156 @@ Name: "cygwin";     Description: "cygwin";     Types: custom;
 
 [Code]
 var
-  ProxyPage: TWizardPage;
+    ProxyPage: TWizardPage;
 
 function StrContain(SearchText: String; TargetText: String; Delimiter: String): Integer;
 begin
-  Result := Pos(Delimiter + SearchText + Delimiter, Delimiter + TargetText + Delimiter) ;
+    Result := Pos(Delimiter + SearchText + Delimiter, Delimiter + TargetText + Delimiter) ;
 end;
 
-// ProxyPage;
+{ ProxyPage }
 procedure CreateProxyPage;
 var
-  // Variables
-  Page: TWizardPage;
-  RegProxyEnable:   Cardinal;
-  RegProxyServer:   String;
-  RegProxyAddress:  String;
-  RegProxyPort:     String;
-  RegProxyOverride: String;
+    { variables }
+    Page: TWizardPage;
+    RegProxyEnable:   Cardinal;
+    RegProxyServer:   String;
+    RegProxyAddress:  String;
+    RegProxyPort:     String;
+    RegProxyOverride: String;
 
-  // Forms  
-  UseProxyCheckBox:    TNewCheckBox;
-  ProxyAddressLabel:   TNewStaticText;
-  ProxyAddressTextBox: TNewEdit;
-  ProxyPortLabel:      TNewStaticText;
-  ProxyPortTextBox:    TNewEdit;
-  AddLocalCheckBox:    TNewCheckBox;
-  AddVmCheckBox:       TNewCheckBox;
-  ProxyNotice:         TNewStaticText;
-  LineCount:  Integer;
-  LineHeight: Integer;
-
+    { forms }
+    UseProxyCheckBox:    TNewCheckBox;
+    ProxyAddressLabel:   TNewStaticText;
+    ProxyAddressTextBox: TNewEdit;
+    ProxyPortLabel:      TNewStaticText;
+    ProxyPortTextBox:    TNewEdit;
+    AddLocalCheckBox:    TNewCheckBox;
+    AddVmCheckBox:       TNewCheckBox;
+    ProxyNotice:         TNewStaticText;
+    LineCount:  Integer;
+    LineHeight: Integer;
 begin
-  ProxyPage := CreateCustomPage(wpInfoBefore, CustomMessage('ProxyPageTitle'), CustomMessage('ProxyPageDesc'));
-  Page := ProxyPage;
+    ProxyPage := CreateCustomPage(wpInfoBefore, CustomMessage('ProxyPageTitle'), CustomMessage('ProxyPageDesc'));
+    Page := ProxyPage;
 
-  // get current proxy registry
-  RegQueryDWordValue (HKEY_CURRENT_USER, '{#HKCU_NetKey}', 'ProxyEnable',   RegProxyEnable);
-  RegQueryStringValue(HKEY_CURRENT_USER, '{#HKCU_NetKey}', 'ProxyServer',   RegProxyServer);
-  if (Length(RegProxyServer) > 0) then
-  begin
-     RegProxyAddress := Copy(RegProxyServer, 1, Pos(':', RegProxyServer) -1);
-     RegProxyPort    := Copy(RegProxyServer, Pos(':', RegProxyServer) + 1, Length(RegProxyServer) - Pos(':', RegProxyServer));
-  end;
- 
-  // create forms
-  LineCount := 0;
-  LineHeight := 24;
+    { get current proxy registry }
+    RegQueryDWordValue (HKEY_CURRENT_USER, '{#HKCU_NetKey}', 'ProxyEnable', RegProxyEnable);
+    RegQueryStringValue(HKEY_CURRENT_USER, '{#HKCU_NetKey}', 'ProxyServer', RegProxyServer);
+    if (Length(RegProxyServer) > 0) then
+    begin
+        RegProxyAddress := Copy(RegProxyServer, 1, Pos(':', RegProxyServer) -1);
+        RegProxyPort    := Copy(RegProxyServer, Pos(':', RegProxyServer) + 1, Length(RegProxyServer) - Pos(':', RegProxyServer));
+    end;
 
-  UseProxyCheckBox := TNewCheckBox.Create(Page);
-  UseProxyCheckBox.Parent := Page.Surface;
-  if (RegProxyEnable = 1) then
-  begin
-    UseProxyCheckBox.Checked := True;
-  end else
-  begin
-    UseProxyCheckBox.Checked := False;
-  end;
-  UseProxyCheckBox.Top := ScaleY(16);
-  UseProxyCheckBox.Width := Page.SurfaceWidth;
-  UseProxyCheckBox.Caption := CustomMessage('ProxyPageUseProxy');
+    { create forms }
+    LineCount := 0;
+    LineHeight := 24;
 
-  LineCount := LineCount + 1;
+    UseProxyCheckBox := TNewCheckBox.Create(Page);
+    with UseProxyCheckBox do
+    begin
+        Parent   := Page.Surface;
+        if (RegProxyEnable = 1) then
+        begin
+        Checked  := True;
+        end else
+        begin
+        Checked  := False;
+        end;
+        Top      := ScaleY(16) + LineCount * LineHeight;
+        Width    := Page.SurfaceWidth;
+        Caption  := CustomMessage('ProxyPageUseProxy');
+    end;
 
-  ProxyAddressLabel := TNewStaticText.Create(Page);
-  ProxyAddressLabel.Parent := Page.Surface;
-  ProxyAddressLabel.Top := ScaleY(16) + LineCount * LineHeight;
-  ProxyAddressLabel.Left := ScaleX(16);
-  ProxyAddressLabel.AutoSize := True;
-  ProxyAddressLabel.Caption := CustomMessage('ProxyPageAddress');
+    LineCount := LineCount + 1;
 
-  ProxyAddressTextBox := TNewEdit.Create(Page);
-  ProxyAddressTextBox.Parent := Page.Surface;
-  ProxyAddressTextBox.Top :=  ScaleY(16) + LineCount * LineHeight;
-  ProxyAddressTextBox.Left := ScaleX(16) + ProxyAddressLabel.Width + ScaleX(8);
-  ProxyAddressTextBox.Width := Page.SurfaceWidth div 2 - ScaleX(8);
-  ProxyAddressTextBox.Text := RegProxyAddress
+    ProxyAddressLabel := TNewStaticText.Create(Page);
+    with ProxyAddressLabel do
+    begin
+        Parent   := Page.Surface;
+        Top      := ScaleY(16) + LineCount * LineHeight;
+        Left     := ScaleX(16);
+        AutoSize := True;
+        Caption  := CustomMessage('ProxyPageAddress');
+    end;
 
-  LineCount := LineCount + 1;
+    ProxyAddressTextBox := TNewEdit.Create(Page);
+    with ProxyAddressTextBox do
+    begin
+        Parent   := Page.Surface;
+        Top      := ScaleY(16) + LineCount * LineHeight;
+        Left     := ScaleX(16) + ProxyAddressLabel.Width + ScaleX(8);
+        Width    := Page.SurfaceWidth div 2 - ScaleX(8);
+        Text     := RegProxyAddress
+    end;
 
-  ProxyPortLabel := TNewStaticText.Create(Page);
-  ProxyPortLabel.Parent := Page.Surface;
-  ProxyPortLabel.Top := ScaleY(16) + LineCount * LineHeight;
-  ProxyPortLabel.Left := ScaleX(16);
-  ProxyPortLabel.AutoSize := True;
-  ProxyPortLabel.Caption := CustomMessage('ProxyPagePort');
+    LineCount := LineCount + 1;
 
-  ProxyPortTextBox := TNewEdit.Create(Page);
-  ProxyPortTextBox.Parent := Page.Surface;
-  ProxyPortTextBox.Top :=  ScaleY(16) + LineCount * LineHeight - ScaleY(2);
-  ProxyPortTextBox.Left := ProxyAddressTextBox.Left;
-  ProxyPortTextBox.Width := Page.SurfaceWidth div 2 - ScaleX(8);
-  ProxyPortTextBox.Text := RegProxyPort
+    ProxyPortLabel := TNewStaticText.Create(Page);
+    with ProxyPortLabel do
+    begin
+        Parent   := Page.Surface;
+        Top      := ScaleY(16) + LineCount * LineHeight;
+        Left     := ScaleX(16);
+        AutoSize := True;
+        Caption  := CustomMessage('ProxyPagePort');
+    end;
 
-  LineCount := LineCount + 1;
+    ProxyPortTextBox := TNewEdit.Create(Page);
+    with ProxyPortTextBox do
+    begin
+        Parent   := Page.Surface;
+        Top      := ScaleY(16) + LineCount * LineHeight - ScaleY(2);
+        Left     := ProxyAddressTextBox.Left;
+        Width    := Page.SurfaceWidth div 2 - ScaleX(8);
+        Text     := RegProxyPort
+    end;
 
-  AddLocalCheckBox := TNewCheckBox.Create(Page);
-  AddLocalCheckBox.Parent := Page.Surface;
-  AddLocalCheckBox.Checked := True;
-  AddLocalCheckBox.Top := ScaleY(16) + LineCount * LineHeight;
-  AddLocalCheckBox.Left := ScaleX(16);
-  AddLocalCheckBox.Width := Page.SurfaceWidth;
-  AddLocalCheckBox.Caption := CustomMessage('ProxyPageAddLocalToNoProxy');
+    LineCount := LineCount + 1;
 
-  LineCount := LineCount + 1;
+    AddLocalCheckBox := TNewCheckBox.Create(Page);
+    with AddLocalCheckBox do
+    begin
+        Parent   := Page.Surface;
+        Checked  := True;
+        Top      := ScaleY(16) + LineCount * LineHeight;
+        Left     := ScaleX(16);
+        Width    := Page.SurfaceWidth;
+        Caption  := CustomMessage('ProxyPageAddLocalToNoProxy');
+    end;
 
-  AddVmCheckBox := TNewCheckBox.Create(Page);
-  AddVmCheckBox.Parent := Page.Surface;
-  AddVmCheckBox.Checked := True;
-  AddVmCheckBox.Top := ScaleY(16) + LineCount * LineHeight;
-  AddVmCheckBox.Left := ScaleX(16);
-  AddVmCheckBox.Width := Page.SurfaceWidth;
-  AddVmCheckBox.Caption := CustomMessage('ProxyPageAddVmToNoProxy');
+    LineCount := LineCount + 1;
 
-  LineCount := LineCount + 1;
+    AddVmCheckBox := TNewCheckBox.Create(Page);
+    with AddVmCheckBox do
+    begin
+        Parent   := Page.Surface;
+        Checked  := True;
+        Top      := ScaleY(16) + LineCount * LineHeight;
+        Left     := ScaleX(16);
+        Width    := Page.SurfaceWidth;
+        Caption  := CustomMessage('ProxyPageAddVmToNoProxy');
+    end;
 
-  ProxyNotice := TNewStaticText.Create(Page);
-  ProxyNotice.Parent := Page.Surface;
-  ProxyNotice.Top := ScaleY(16) + LineCount * LineHeight;
-  ProxyNotice.Left := ScaleX(0);
-  ProxyNotice.AutoSize := True;
-  ProxyNotice.Caption := CustomMessage('ProxyPageNotice');
+    LineCount := LineCount + 1;
 
+    ProxyNotice := TNewStaticText.Create(Page);
+    with ProxyNotice do
+    begin
+        Parent   := Page.Surface;
+        Top      := ScaleY(16) + LineCount * LineHeight;
+        Left     := ScaleX(0);
+        AutoSize := True;
+        Caption  := CustomMessage('ProxyPageNotice');
+    end;
 end;
 
 
 procedure InitializeWizard;
 begin
-  { Create the pages }
-  CreateProxyPage;
+    { create the custom pages }
+    CreateProxyPage;
 
 //  AboutThisPage := CreateOutputMsgPage(
 //    wpWelcome,                            // Show after welcome page
@@ -239,7 +261,7 @@ end;
 
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
-  { Skip pages that shouldn't be shown }
-  Result := False;
+    { Skip pages that shouldn't be shown }
+    Result := False;
 end;
 
