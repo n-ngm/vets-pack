@@ -20,8 +20,13 @@
 #define MyAppVersion "0.1.1"
 #define MyOutputFile  StringChange(MyAppName, " ", "_") + "." + StringChange(MyAppVersion, ".", "_")
 
+#define SetupIni     "..\Files\setup.ini"
+
 ; Include Inno-Setup Download Plugin
 #include <idp.iss>
+
+; Incluce sub modules
+#include "Src\Virtualbox.iss"
 
 [Setup]
 AppName={#MyAppName}
@@ -246,16 +251,18 @@ end;
 
 
 procedure InitializeWizard;
+var
+ test: String;
 begin
     { create the custom pages }
     CreateProxyPage;
 
-//  AboutThisPage := CreateOutputMsgPage(
-//    wpWelcome,                            // Show after welcome page
-//    '{#emit SetupSetting("AppVerName")}', // Page caption
-//    CustomMessage('AppSimpleInfo'),       // Page description
-//    CustomMessage('AboutThis')            // Main message  
-//  );
+    test := GetIniString(
+    'virtualbox',
+    'VirtualBoxDownloadUrl',
+    'bad read',
+    ExpandConstant('{#SetupIni}')
+    );
 
 end;
 
