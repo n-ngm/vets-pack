@@ -25,9 +25,6 @@
 ; Include Inno-Setup Download Plugin
 #include <idp.iss>
 
-; Incluce sub modules
-#include "Src\Virtualbox.iss"
-
 [Setup]
 AppName={#MyAppName}
 AppVerName={#MyAppName} {#MyAppVersion}
@@ -103,13 +100,11 @@ Name: "cygwin";     Description: "cygwin";     Types: custom;
 
 
 [Code]
+#include "Src\Common.iss"
+#include "Src\Virtualbox.iss"
+
 var
     ProxyPage: TWizardPage;
-
-function StrContain(SearchText: String; TargetText: String; Delimiter: String): Integer;
-begin
-    Result := Pos(Delimiter + SearchText + Delimiter, Delimiter + TargetText + Delimiter) ;
-end;
 
 { ProxyPage }
 procedure CreateProxyPage;
@@ -249,6 +244,25 @@ begin
     end;
 end;
 
+procedure InstallSoftware();
+var
+  SoftwareName: String;
+  ExeFileName:  String;
+  Params:       String;
+  InstallDir:   String;
+  ResultCode:   Integer;
+begin
+    { prepare VirtualBox }
+    if IsComponentSelected('VirtualBox') then
+    begin
+    end;
+//  GetIniString(
+//    'virtualbox',
+//    'VirtualBoxDownloadUrl',
+//    'bad read',
+//    ExpandConstant('{#SetupIni}')
+//    );
+end;
 
 procedure InitializeWizard;
 var
@@ -257,13 +271,20 @@ begin
     { create the custom pages }
     CreateProxyPage;
 
-    test := GetIniString(
-    'virtualbox',
-    'VirtualBoxDownloadUrl',
-    'bad read',
-    ExpandConstant('{#SetupIni}')
-    );
+end;
 
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+    case CurStep of
+        ssPostInstall:
+        begin
+            try
+                InstallSoftware;
+            finally
+                DelTree(ExpandConstant('{tmp}') + '\*', False, True, True);
+            end;
+        end;
+    end;
 end;
 
 function ShouldSkipPage(PageID: Integer): Boolean;
