@@ -17,7 +17,7 @@
 ; Define MyApp Info
 #define MyPublisher  "ClickMaker"
 #define MyAppName    "Virtual Environment Installer Pack"
-#define MyAppVersion "2.0.4"
+#define MyAppVersion "0.1.1"
 #define MyOutputFile  StringChange(MyAppName, " ", "_") + "." + StringChange(MyAppVersion, ".", "_")
 
 ; Include Inno-Setup Download Plugin
@@ -81,6 +81,21 @@ Name: english; \
 
 [Files]
 Source: "Files\*"; DestDir: "{app}"; Flags: isreadme ignoreversion touch
+
+
+[Types]
+; disable installation type dropdown
+Name: "custom"; Description: "Normal installation"; Flags: iscustom
+
+[Components]
+; ViatualBox (about 169MB)
+Name: "VirtualBox"; Description: "VirtualBox"; Types: custom; ExtraDiskSpaceRequired: 177209344
+; Vagrant (about 575 MB)
+Name: "Vagrant";    Description: "Vagrant";    Types: custom; ExtraDiskSpaceRequired: 602931200
+; Chef Development Kit (about 340MB)
+Name: "ChefDK";     Description: "Chef Development Kit"; Types: custom; ExtraDiskSpaceRequired: 356515840
+Name: "cygwin";     Description: "cygwin";     Types: custom;
+
 
 [Code]
 var
