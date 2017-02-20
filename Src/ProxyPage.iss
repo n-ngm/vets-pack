@@ -186,3 +186,56 @@ begin
     end;
 end;
 
+{ set internet proxy setting }
+procedure SetProxyToRegistry;
+var
+    RegProxyServer:   String;
+begin
+    if ProxyForms.UseProxyCheckBox.Checked then
+    begin
+        // TODO set each protcol
+        if Length(ProxyForms.ProxyAddressTextBox.Text) > 0 then
+        begin
+            RegProxyServer := ProxyForms.ProxyAddressTextBox.Text;
+            if Length(ProxyForms.ProxyPortTextBox.Text) > 0 then
+            begin
+                RegProxyServer := RegProxyServer + ':' + ProxyForms.ProxyPortTextBox.Text;
+            end;
+
+            RegWriteStringValue(HKEY_CURRENT_USER,  '{#HKCU_NetKey}', 'ProxyServer',  RegProxyServer);
+            RegWriteStringValue(HKEY_LOCAL_MACHINE, '{#HKLM_EnvKey}', 'http_proxy',   'http://' + RegProxyServer);
+            RegWriteStringValue(HKEY_LOCAL_MACHINE, '{#HKLM_EnvKey}', 'https_proxy',  'http://' + RegProxyServer);
+        end else begin
+            RegDeleteValue(HKEY_CURRENT_USER,  '{#HKCU_NetKey}', 'ProxyServer');
+            RegDeleteValue(HKEY_LOCAL_MACHINE, '{#HKLM_EnvKey}', 'http_proxy');
+            RegDeleteValue(HKEY_LOCAL_MACHINE, '{#HKLM_EnvKey}', 'https_proxy');
+        end;
+
+        if ProxyForms.AddLocalCheckBox.Checked then
+        begin
+            RegAddStringValue(HKEY_CURRENT_USER,  '{#HKCU_NetKey}', 'ProxyOverride', '<local>', ';');
+            RegAddStringValue(HKEY_LOCAL_MACHINE, '{#HKLM_EnvKey}', 'no_proxy',   'localhost',  ',');
+        end else begin
+            RegRemoveStringValue(HKEY_CURRENT_USER,  '{#HKCU_NetKey}', 'ProxyOverride', '<local>', ';');
+            RegRemoveStringValue(HKEY_LOCAL_MACHINE, '{#HKLM_EnvKey}', 'no_proxy',   'localhost',  ',');
+        end;
+
+        if ProxyForms.AddVmCheckBox.Checked then
+        begin
+            RegAddStringValue(HKEY_CURRENT_USER, '{#HKCU_NetKey}', 'ProxyOverride', '*.local',  ';');
+            RegAddStringValue(HKEY_CURRENT_USER, '{#HKCU_NetKey}', 'ProxyOverride', '*.vmhost', ';');
+            RegAddStringValue(HKEY_LOCAL_MACHINE, '{#HKLM_EnvKey}', 'no_proxy', '*.local',  ',');
+            RegAddStringValue(HKEY_LOCAL_MACHINE, '{#HKLM_EnvKey}', 'no_proxy', '*.vmhost', ',');
+        end else begin
+            RegRemoveStringValue(HKEY_CURRENT_USER, '{#HKCU_NetKey}', 'ProxyOverride', '*.local',  ';');
+            RegRemoveStringValue(HKEY_CURRENT_USER, '{#HKCU_NetKey}', 'ProxyOverride', '*.vmhost', ';');
+            RegRemoveStringValue(HKEY_LOCAL_MACHINE, '{#HKLM_EnvKey}', 'no_proxy', '*.local',  ',');
+            RegRemoveStringValue(HKEY_LOCAL_MACHINE, '{#HKLM_EnvKey}', 'no_proxy', '*.vmhost', ',');
+        end;
+
+        RegWriteDwordValue (HKEY_CURRENT_USER, '{#HKCU_NetKey}', 'ProxyEnable',   1);
+
+    end else begin
+        RegWriteDwordValue (HKEY_CURRENT_USER, '{#HKCU_NetKey}', 'ProxyEnable',   0);
+    end;
+end;

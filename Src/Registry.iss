@@ -17,17 +17,42 @@ function RegAddStringValue(RootKey: Integer; SubKeyName: String; TargetKey: Stri
 var
     OrigValue: String;
 begin
+    { if already set, then return true }
     if (RegStringPosition(RootKey, SubKeyName, TargetKey, TargetValue, Delimiter) > 0) then
     begin
         Result := True;
         exit;
     end;
+    { if query failed, create }
+    if not RegQueryStringValue(RootKey, SubKeyName, TargetKey, OrigValue) then
+    begin
+        Result := RegWriteStringValue(RootKey, SubKeyName, TargetKey, TargetValue);
+        exit;
+    end;
+    { add string value }
+    Result := RegWriteStringValue(RootKey, SubKeyName, TargetKey, ExpandConstant(OrigValue + Delimiter + TargetValue));
+end;
+
+function RegRemoveStringValue(RootKey: Integer; SubKeyName: String; TargetKey: String; TargetValue: String; Delimiter: String): Boolean;
+var
+    OrigValue: String;
+begin
+    { if query failed, then return false }
     if not RegQueryStringValue(RootKey, SubKeyName, TargetKey, OrigValue) then
     begin
         Result := False;
         exit;
     end;
-    Result := RegWriteStringValue(RootKey, SubKeyName, TargetKey, ExpandConstant(OrigValue + Delimiter + TargetValue));
+    { if not exists, then return true }
+    if (RegStringPosition(RootKey, SubKeyName, TargetKey, TargetValue, Delimiter) = 0) then
+    begin
+        Result := True;
+        exit;
+    end;
+
+    StringChange(OrigValue, TargetValue, '' );
+    StringChange(OrigValue, Delimiter + Delimiter, Delimiter);
+    Result := RegWriteStringValue(RootKey, SubKeyName, TargetKey, OrigValue);
 end;
 
 function NeedsAddPath(Param: String): boolean;
