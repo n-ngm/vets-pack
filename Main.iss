@@ -17,10 +17,10 @@
 ; Define MyApp Info
 #define MyPublisher  "ClickMaker"
 #define MyAppName    "Virtual Environment Installer Pack"
-#define MyAppVersion "0.1.1"
+#define MyAppVersion "0.1.3"
 #define MyOutputFile  StringChange(MyAppName, " ", "_") + "." + StringChange(MyAppVersion, ".", "_")
 
-#define SetupIni     "..\Files\setup.ini"
+#define SetupIni     "Setup.ini"
 
 ; Include Inno-Setup Download Plugin
 #include <idp.iss>
@@ -35,12 +35,12 @@ OutputBaseFilename={#MyOutputFile}
 ; Enable Logging
 SetupLogging=yes
 
-; Require Admin Execution 
+; Require Admin Execution
 PrivilegesRequired=admin
 
-; ------------- Inno-Setup Default Pages Setup 
-; Select Language Dialog 
-ShowLanguageDialog=no
+; ------------- Inno-Setup Default Pages Setup
+; Select Language Dialog
+ShowLanguageDialog=yes
 
 ; Show Welcome Page
 DisableWelcomePage=yes
@@ -84,6 +84,8 @@ Name: english; \
 [Files]
 Source: "Files\*"; DestDir: "{app}"; Flags: isreadme ignoreversion touch
 
+[INI]
+Filename: "{app}\Setup.ini"; Section: "VirtualBox";
 
 [Types]
 ; disable installation type dropdown
@@ -130,8 +132,8 @@ begin
     { create the custom pages }
     ProxyPage := CreateProxyPage(wpInfoBefore);
 
-    { download starts after ready page }
-    idpDownloadAfter(wpReady);
+    { download starts set }
+    idpDownloadAfter(wpInstalling);
 end;
 
 procedure CurPageChanged(CurPageID: Integer);
@@ -140,23 +142,30 @@ var
     DownloadUrl: String;
     SavedPath:   String;
 begin
-    if CurPageID = wpReady then
+    if CurPageID = wpInstalling then
     begin
         // User can navigate to 'Ready to install' page several times, so we
         // need to clear file list to ensure that only needed files are added.
         idpClearFiles;
 
-        SoftName    := 'VirtualBox';
+        SoftName := 'VirtualBox';
         if IsComponentSelected(Softname) then
         begin
-            DownloadUrl := GetIniString(SoftName, SoftName + 'DownloadUrl',  '', ExpandConstant('{#SetupIni}'));
-            SavedPath   := GetIniString(SoftName, SoftName + 'SaveFileName', '', ExpandConstant('{#SetupIni}'));
+            DownloadUrl := GetIniString(SoftName, SoftName + 'DownloadUrl',  '', ExpandConstant('{app}') + '/' + ExpandConstant('{#SetupIni}'));
+            SavedPath   := GetIniString(SoftName, SoftName + 'SaveFileName', '', ExpandConstant('{app}') + '/' + ExpandConstant('{#SetupIni}'));
+            MsgBox(DownloadUrl, mbConfirmation, MB_OK);
+            MsgBox(SavedPath,   mbConfirmation, MB_OK);
             idpAddFile(DownloadUrl, SavedPath);
         end;
+
   end;
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
+var
+    SoftName:    String;
+    DownloadUrl: String;
+    SavedPath:   String;
 begin
     case CurStep of
         ssPostInstall:
