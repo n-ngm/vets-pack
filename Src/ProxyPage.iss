@@ -1,16 +1,6 @@
-[Code]
 { ProxyPage }
-function CreateProxyPage(AfterID: Integer): TWizardPage;
-var
-    { variables }
-    Page: TWizardPage;
-    RegProxyEnable:   Cardinal;
-    RegProxyServer:   String;
-    RegProxyAddress:  String;
-    RegProxyPort:     String;
-    RegProxyOverride: String;
-
-    { forms }
+{ define enum }
+type TProxyForms = record
     UseProxyCheckBox:    TNewCheckBox;
     ProxyAddressLabel:   TNewStaticText;
     ProxyAddressTextBox: TNewEdit;
@@ -19,10 +9,31 @@ var
     AddLocalCheckBox:    TNewCheckBox;
     AddVmCheckBox:       TNewCheckBox;
     ProxyNotice:         TNewStaticText;
-    LineCount:  Integer;
-    LineHeight: Integer;
+end;
+
+{ define global variables }
+var
+    ProxyPage  : TInputQueryWizardPage;
+    ProxyForms : TProxyForms;
+
+{ define hook method }
+procedure UseProxyCheckBoxClick (Sender: TObject); forward;
+
+{ create proxy page }
+procedure CreateProxyPage(AfterID: Integer);
+var
+    Page  : TInputQueryWizardPage;
+    Forms : TProxyForms;
+    RegProxyEnable:   Cardinal;
+    RegProxyServer:   String;
+    RegProxyAddress:  String;
+    RegProxyPort:     String;
+    RegProxyOverride: String;
+    LineCount:        Integer;
+    LineHeight:       Integer;
 begin
-    Page := CreateCustomPage(AfterID, CustomMessage('ProxyPageTitle'), CustomMessage('ProxyPageDesc'));
+    { create page }
+    Page  := CreateInputQueryPage(AfterID, CustomMessage('ProxyPageTitle'), CustomMessage('ProxyPageDesc'), '');
 
     { get current proxy registry }
     RegQueryDWordValue (HKEY_CURRENT_USER, '{#HKCU_NetKey}', 'ProxyEnable', RegProxyEnable);
@@ -37,17 +48,11 @@ begin
     LineCount := 0;
     LineHeight := 24;
 
-    UseProxyCheckBox := TNewCheckBox.Create(Page);
-    with UseProxyCheckBox do
+    Forms.UseProxyCheckBox := TNewCheckBox.Create(Page);
+    with Forms.UseProxyCheckBox do
     begin
         Parent   := Page.Surface;
-        if (RegProxyEnable = 1) then
-        begin
-        Checked  := True;
-        end else
-        begin
         Checked  := False;
-        end;
         Top      := ScaleY(16) + LineCount * LineHeight;
         Width    := Page.SurfaceWidth;
         Caption  := CustomMessage('ProxyPageUseProxy');
@@ -55,8 +60,8 @@ begin
 
     LineCount := LineCount + 1;
 
-    ProxyAddressLabel := TNewStaticText.Create(Page);
-    with ProxyAddressLabel do
+    Forms.ProxyAddressLabel := TNewStaticText.Create(Page);
+    with Forms.ProxyAddressLabel do
     begin
         Parent   := Page.Surface;
         Top      := ScaleY(16) + LineCount * LineHeight;
@@ -65,20 +70,20 @@ begin
         Caption  := CustomMessage('ProxyPageAddress');
     end;
 
-    ProxyAddressTextBox := TNewEdit.Create(Page);
-    with ProxyAddressTextBox do
+    Forms.ProxyAddressTextBox := TNewEdit.Create(Page);
+    with Forms.ProxyAddressTextBox do
     begin
         Parent   := Page.Surface;
         Top      := ScaleY(16) + LineCount * LineHeight;
-        Left     := ScaleX(16) + ProxyAddressLabel.Width + ScaleX(8);
+        Left     := ScaleX(16) + Forms.ProxyAddressLabel.Width + ScaleX(8);
         Width    := Page.SurfaceWidth div 2 - ScaleX(8);
         Text     := RegProxyAddress
     end;
 
     LineCount := LineCount + 1;
 
-    ProxyPortLabel := TNewStaticText.Create(Page);
-    with ProxyPortLabel do
+    Forms.ProxyPortLabel := TNewStaticText.Create(Page);
+    with Forms.ProxyPortLabel do
     begin
         Parent   := Page.Surface;
         Top      := ScaleY(16) + LineCount * LineHeight;
@@ -87,20 +92,20 @@ begin
         Caption  := CustomMessage('ProxyPagePort');
     end;
 
-    ProxyPortTextBox := TNewEdit.Create(Page);
-    with ProxyPortTextBox do
+    Forms.ProxyPortTextBox := TNewEdit.Create(Page);
+    with Forms.ProxyPortTextBox do
     begin
         Parent   := Page.Surface;
         Top      := ScaleY(16) + LineCount * LineHeight - ScaleY(2);
-        Left     := ProxyAddressTextBox.Left;
+        Left     := Forms.ProxyAddressTextBox.Left;
         Width    := Page.SurfaceWidth div 2 - ScaleX(8);
         Text     := RegProxyPort
     end;
 
     LineCount := LineCount + 1;
 
-    AddLocalCheckBox := TNewCheckBox.Create(Page);
-    with AddLocalCheckBox do
+    Forms.AddLocalCheckBox := TNewCheckBox.Create(Page);
+    with Forms.AddLocalCheckBox do
     begin
         Parent   := Page.Surface;
         Checked  := True;
@@ -112,8 +117,8 @@ begin
 
     LineCount := LineCount + 1;
 
-    AddVmCheckBox := TNewCheckBox.Create(Page);
-    with AddVmCheckBox do
+    Forms.AddVmCheckBox := TNewCheckBox.Create(Page);
+    with Forms.AddVmCheckBox do
     begin
         Parent   := Page.Surface;
         Checked  := True;
@@ -125,8 +130,8 @@ begin
 
     LineCount := LineCount + 1;
 
-    ProxyNotice := TNewStaticText.Create(Page);
-    with ProxyNotice do
+    Forms.ProxyNotice := TNewStaticText.Create(Page);
+    with Forms.ProxyNotice do
     begin
         Parent   := Page.Surface;
         Top      := ScaleY(16) + LineCount * LineHeight;
@@ -135,5 +140,49 @@ begin
         Caption  := CustomMessage('ProxyPageNotice');
     end;
 
-    Result := Page;
+    { check by current setting }
+    if (RegProxyEnable = 1) then
+    begin
+        Forms.UseProxyCheckBox.Checked  := True;
+    end else begin
+        Forms.UseProxyCheckBox.Checked  := False;
+    end;
+
+    { return to global }
+    ProxyPage  := Page;
+    ProxyForms := Forms;
+
+    { set onclick hook }
+    ProxyForms.UseProxyCheckBox.OnClick := @UseProxyCheckBoxClick;
+    UseProxyCheckBoxClick(Page);
 end;
+
+{ enable/disable forms if proxy is enabled or not }
+procedure UseProxyCheckBoxClick (Sender: TObject);
+begin
+    if ProxyForms.UseProxyCheckBox.Checked then
+    begin
+        with ProxyForms do
+        begin
+            ProxyAddressLabel.Enabled   := True;
+            ProxyAddressTextBox.Enabled := True;
+            ProxyPortLabel.Enabled      := True;
+            ProxyPortTextBox.Enabled    := True;
+            AddLocalCheckBox.Enabled    := True;
+            AddVmCheckBox.Enabled       := True;
+            ProxyNotice.Enabled         := True;
+        end;
+    end else begin
+        with ProxyForms do
+        begin
+            ProxyAddressLabel.Enabled   := False;
+            ProxyAddressTextBox.Enabled := False;
+            ProxyPortLabel.Enabled      := False;
+            ProxyPortTextBox.Enabled    := False;
+            AddLocalCheckBox.Enabled    := False;
+            AddVmCheckBox.Enabled       := False;
+            ProxyNotice.Enabled         := False;
+        end;
+    end;
+end;
+

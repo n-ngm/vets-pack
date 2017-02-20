@@ -101,14 +101,11 @@ Name: "ChefDK";     Description: "Chef Development Kit"; Types: custom; ExtraDis
 ; Cygwin
 Name: "Cygwin";     Description: "cygwin";     Types: custom;
 
-
 [Code]
 #include "Src\Common.iss"
+#include "Src\Registry.iss"
 #include "Src\ProxyPage.iss"
 #include "Src\Virtualbox.iss"
-
-var
-    ProxyPage: TWizardPage;
 
 
 procedure InstallSoftware();
@@ -126,11 +123,9 @@ begin
 end;
 
 procedure InitializeWizard;
-var
- test: String;
 begin
     { create the custom pages }
-    ProxyPage := CreateProxyPage(wpInfoBefore);
+    CreateProxyPage(wpInfoBefore);
 
     { download starts set }
     idpDownloadAfter(wpInstalling);
@@ -142,8 +137,21 @@ var
     DownloadUrl: String;
     SavedPath:   String;
 begin
+    if CurPageID = wpPreparing then
+    begin
+
+//        if ProxyPage.Values[0] then
+//        begin
+//            MsgBox('proxy set', mbConfirmation, MB_YESNO);
+//        end else begin
+//            MsgBox('proxy not', mbConfirmation, MB_YESNO);
+//        end;
+
+    end;
+
     if CurPageID = wpInstalling then
     begin
+        MsgBox('after wpInstalling', mbConfirmation, MB_YESNO);
         // User can navigate to 'Ready to install' page several times, so we
         // need to clear file list to ensure that only needed files are added.
         idpClearFiles;
@@ -155,10 +163,9 @@ begin
             SavedPath   := GetIniString(SoftName, SoftName + 'SaveFileName', '', ExpandConstant('{app}') + '/' + ExpandConstant('{#SetupIni}'));
             MsgBox(DownloadUrl, mbConfirmation, MB_OK);
             MsgBox(SavedPath,   mbConfirmation, MB_OK);
-            idpAddFile(DownloadUrl, SavedPath);
+            //idpAddFile(DownloadUrl, SavedPath);
         end;
-
-  end;
+    end;
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
@@ -177,6 +184,17 @@ begin
             end;
         end;
     end;
+end;
+
+function NextButtonClick(CurPageID: Integer): Boolean;
+begin
+    case CurPageID of
+        ProxyPage.ID:
+        begin
+            MsgBox(IntToStr(Integer(ProxyForms.UseProxyCheckBox.Checked)), mbConfirmation, MB_YESNO);
+        end;
+    end;
+    Result := True;
 end;
 
 function ShouldSkipPage(PageID: Integer): Boolean;
