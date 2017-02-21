@@ -10,20 +10,20 @@
 ;   - Path
 ;
 
-; Registry Position
-#define HKLM_EnvKey "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"
-#define HKCU_NetKey "Software\Microsoft\Windows\CurrentVersion\Internet Settings"
-
 ; Define MyApp Info
 #define MyPublisher  "ClickMaker"
 #define MyAppName    "Virtual Environment Installer Pack"
-#define MyAppVersion "0.1.4"
+#define MyAppVersion "0.1.6"
 #define MyOutputFile  StringChange(MyAppName, " ", "_") + "." + StringChange(MyAppVersion, ".", "_")
 
 #define SetupIni     "Setup.ini"
 
 ; Include Inno-Setup Download Plugin
 #include <idp.iss>
+#include "Src\Common.iss"
+#include "Src\Registry.iss"
+#include "Src\ProxyPage.iss"
+#include "Src\Virtualbox.iss"
 
 [Setup]
 AppName={#MyAppName}
@@ -91,10 +91,6 @@ Name: "ChefDK";     Description: "Chef Development Kit"; Types: custom; ExtraDis
 Name: "Cygwin";     Description: "cygwin";               Types: custom;
 
 [Code]
-#include "Src\Common.iss"
-#include "Src\Registry.iss"
-#include "Src\ProxyPage.iss"
-#include "Src\Virtualbox.iss"
 
 procedure InstallSoftware(); forward;
 
