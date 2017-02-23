@@ -21,3 +21,24 @@ begin
     end;
 end;
 
+function ExecOtherInstaller(SoftName: String; ExecCommand: String; Params: String): Boolean;
+var
+    StatusText: String;
+    ResultCode: Integer;
+begin
+    StatusText := WizardForm.StatusLabel.Caption;
+    WizardForm.StatusLabel.Caption := 'Executing ' + SoftName + ' Installation.';
+    WizardForm.ProgressGauge.Style := npbstMarquee;
+
+    try
+        Result := True;
+        if not Exec(ExecCommand, Params, '', SW_SHOW, ewWaitUntilTerminated, ResultCode) then
+        begin
+            MsgBox(SoftName + ' installation failed with code: ' + IntToStr(ResultCode), mbError, MB_OK);
+            Result := False;
+        end;
+    finally
+        WizardForm.StatusLabel.Caption := StatusText;
+        WizardForm.ProgressGauge.Style := npbstNormal;
+    end;
+end;

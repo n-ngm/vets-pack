@@ -13,7 +13,7 @@
 ; Define MyApp Info
 #define MyPublisher  "ClickMaker"
 #define MyAppName    "Virtual Environment Installer Pack"
-#define MyAppVersion "0.1.8"
+#define MyAppVersion "0.1.9"
 #define MyOutputFile  StringChange(MyAppName, " ", "_") + "." + StringChange(MyAppVersion, ".", "_")
 
 #define SetupIni     "Setup.ini"
@@ -209,6 +209,13 @@ begin
     if IsComponentSelected(SoftName) then
     begin
         Virtualbox_Install(GetInstallerPath(SoftName));
+    end;
+
+    // install Vagrant
+    SoftName := 'Vagrant';
+    if IsComponentSelected(SoftName) then
+    begin
+        Vagrant_Install(GetInstallerPath(SoftName));
     end;
 end;
 

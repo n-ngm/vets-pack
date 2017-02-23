@@ -1,28 +1,29 @@
 [Code]
+(**---------------------------
+ * VirtualBox functions
+ * --------------------------- *)
+
+(**
+ * Virtualbox_Exists
+ *   check if VirtualBox has already been installed
+ *)
 function Virtualbox_Exists(): Boolean;
 begin
     Result := RegKeyExists(HKEY_LOCAL_MACHINE, 'SOFTWARE\Oracle\VirtualBox');
 end;
 
-function Virtualbox_Install(InstallerPath: String): Boolean;
+(**
+ * Virtualbox_Install
+ *   execute Virtualbox installer
+ *)
+procedure Virtualbox_Install(InstallerPath: String);
 var
-  Params: String;
-  StatusText: String;
-  ResultCode: Integer;
+    SoftName:    String;
+    ExecCommand: String;
+    Params:      String;
 begin
-  StatusText := WizardForm.StatusLabel.Caption;
-  WizardForm.StatusLabel.Caption := 'Executing VirtualBox Installer. Please complete.';
-  WizardForm.ProgressGauge.Style := npbstMarquee;
-  try
-    Result := True;
-    Params := '-msiparams ALLUSERS=1';
-    if not Exec(InstallerPath, Params, '', SW_HIDE, ewWaitUntilTerminated, ResultCode) then
-    begin
-      MsgBox('VirtualBox installation failed with code: ' + IntToStr(ResultCode), mbError, MB_OK);
-      Result := False;
-    end;
-  finally
-    WizardForm.StatusLabel.Caption := StatusText;
-    WizardForm.ProgressGauge.Style := npbstNormal;
-  end;
+    SoftName    := 'VirtualBox';
+    ExecCommand := InstallerPath;
+    Params      := '-msiparams ALLUSERS=1';
+    ExecOtherInstaller(SoftName, ExecCommand, Params);
 end;
