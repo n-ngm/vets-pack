@@ -13,7 +13,7 @@
 ; Define MyApp Info
 #define MyPublisher  "ClickMaker"
 #define MyAppName    "Virtual Environment Installer Pack"
-#define MyAppVersion "0.1.9"
+#define MyAppVersion "0.1.10"
 #define MyOutputFile  StringChange(MyAppName, " ", "_") + "." + StringChange(MyAppVersion, ".", "_")
 
 #define SetupIni     "Setup.ini"
@@ -27,6 +27,7 @@
 #include "Src\ProxyPage.iss"
 #include "Src\Virtualbox.iss"
 #include "Src\Vagrant.iss"
+#include "Src\ChefDK.iss"
 
 [Setup]
 AppName={#MyAppName}
@@ -216,6 +217,13 @@ begin
     if IsComponentSelected(SoftName) then
     begin
         Vagrant_Install(GetInstallerPath(SoftName));
+    end;
+
+    // install ChefDK
+    SoftName := 'ChefDK';
+    if IsComponentSelected(SoftName) then
+    begin
+        ChefDK_Install(GetInstallerPath(SoftName));
     end;
 end;
 
