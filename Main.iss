@@ -13,17 +13,20 @@
 ; Define MyApp Info
 #define MyPublisher  "ClickMaker"
 #define MyAppName    "Virtual Environment Installer Pack"
-#define MyAppVersion "0.1.7"
+#define MyAppVersion "0.1.8"
 #define MyOutputFile  StringChange(MyAppName, " ", "_") + "." + StringChange(MyAppVersion, ".", "_")
 
 #define SetupIni     "Setup.ini"
 
 ; Include Inno-Setup Download Plugin
 #include <idp.iss>
+
+; inclue sources
 #include "Src\Common.iss"
 #include "Src\Registry.iss"
 #include "Src\ProxyPage.iss"
 #include "Src\Virtualbox.iss"
+#include "Src\Vagrant.iss"
 
 [Setup]
 AppName={#MyAppName}
@@ -93,8 +96,10 @@ Name: "Cygwin";     Description: "cygwin";               Types: custom;
 var
     DownloadDir: String;
 
-procedure ListUpSoftware();  forward;
-procedure InstallSoftware(); forward;
+procedure ListUpSoftware;  forward;
+procedure InstallSoftware; forward;
+function  GetDownloadUrl  (SoftName: String): String; forward;
+function  GetInstallerPath(SoftName: String): String; forward;
 
 procedure InitializeWizard;
 begin
@@ -158,59 +163,84 @@ end;
 
 procedure ListUpSoftware;
 var
-    SoftNames:    array of String;
-    SoftName:     String;
-    DownloadUrl:  String;
-    SaveFileName: String;
+    SoftNames:     array of String;
+    SoftName:      String;
+    DownloadUrl:   String;
+    InstallerPath: String;
     i: Integer;
 begin
     { reset file list }
     idpClearFiles;
 
-    SetArrayLength(SoftNames, 3);
+    SetArrayLength(SoftNames, 4);
     SoftNames[0] := 'VirtualBox';
     SoftNames[1] := 'Vagrant';
     SoftNames[2] := 'ChefDK';
+    SoftNames[3] := 'Cygwin';
     { add download file list }
-    for i := 0 to 2 do
+    for i := 0 to 3 do
     begin
         SoftName := SoftNames[i];
-        if IsComponentSelected(Softname) then
+        if IsComponentSelected(SoftName) then
         begin
-            DownloadUrl  := GetIniString(SoftName, SoftName + 'DownloadUrl',  '', ExpandConstant('{tmp}\{#SetupIni}'));
-            SaveFileName := GetIniString(SoftName, SoftName + 'SaveFileName', '', ExpandConstant('{tmp}\{#SetupIni}'));
-            idpAddFile(DownloadUrl, ExpandConstant(DownloadDir) + '\' + SaveFileName);
+            DownloadUrl   := GetDownloadUrl(SoftName);
+            InstallerPath := GetInstallerPath(SoftName);
+            idpAddFile(DownloadUrl, InstallerPath);
         end;
     end;
 
-    if IsComponentSelected('Cygwin') then
-    begin
-        SoftName := 'Cygwin';
-
-        if IsWin64 then
-        begin
-            DownloadUrl  := GetIniString(SoftName, 'Cygwin64DownloadUrl',  '', ExpandConstant('{tmp}\{#SetupIni}'));
-        end else begin
-            DownloadUrl  := GetIniString(SoftName, 'Cygwin32DownloadUrl',  '', ExpandConstant('{tmp}\{#SetupIni}'));
-        end;
-
-        SaveFileName := GetIniString(SoftName, SoftName + 'SaveFileName', '', ExpandConstant('{tmp}\{#SetupIni}'));
-        idpAddFile(DownloadUrl, ExpandConstant(DownloadDir) + '\' + SaveFileName);
-    end;
 end;
 
 
+(**
+ * InstallSoftware
+ *   execute installers.
+ *)
 procedure InstallSoftware;
 var
-    SoftwareName: String;
+    SoftName:     String;
     ExeFileName:  String;
     Params:       String;
     InstallDir:   String;
     ResultCode:   Integer;
 begin
-    { prepare VirtualBox }
-    if IsComponentSelected('VirtualBox') then
+    // install VirtualBox
+    SoftName := 'VirtualBox';
+    if IsComponentSelected(SoftName) then
     begin
+        Virtualbox_Install(GetInstallerPath(SoftName));
     end;
 end;
 
+(**
+ * GetDownloadUrl
+ *   get download url from setup.ini
+ *)
+function GetDownloadUrl (SoftName: String): String;
+var
+    Bit: String;
+begin
+    Bit := '';
+    if SoftName = 'Cygwin' then
+    begin
+        if IsWin64 then
+        begin
+            Bit := '64';
+        end else begin
+            Bit := '32';
+        end;
+    end;
+    Result := GetIniString(SoftName, SoftName + Bit + 'DownloadUrl',  '', ExpandConstant('{tmp}\{#SetupIni}'));
+end;
+
+(**
+ * GetInstallerPath
+ *   get the path of downloaded installer.
+ *)
+function GetInstallerPath(SoftName: String): String;
+var
+    SaveFileName: String;
+begin
+    SaveFileName := GetIniString(SoftName, SoftName + 'SaveFileName', '', ExpandConstant('{tmp}\{#SetupIni}'));
+    Result := ExpandConstant(DownloadDir + '\' + SaveFileName);
+end;

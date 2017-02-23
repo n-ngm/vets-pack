@@ -1,6 +1,10 @@
-
 [Code]
-(* --- Proxy Page, Setting --- *)
+(**-----------------------
+ * Proxy functions
+ *  - proxy page, setting
+ *  - depends Registry.iss
+ * ----------------------- *)
+
 (**
  * define enumeration
  *   inno setup can not use "class".

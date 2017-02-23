@@ -1,8 +1,11 @@
+[Code]
+(**---------------------------
+ * Registry utility functions
+ * --------------------------- *)
+
 #define HKLM_EnvKey "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"
 #define HKCU_NetKey "Software\Microsoft\Windows\CurrentVersion\Internet Settings"
 
-[Code]
-(* --- Registry utility functions --- *)
 (**
  * RegStringContained
  *   check if string is contained in string type registry
