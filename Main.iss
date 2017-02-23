@@ -13,7 +13,7 @@
 ; Define MyApp Info
 #define MyPublisher  "ClickMaker"
 #define MyAppName    "Virtual Environment Installer Pack"
-#define MyAppVersion "0.1.6"
+#define MyAppVersion "0.1.7"
 #define MyOutputFile  StringChange(MyAppName, " ", "_") + "." + StringChange(MyAppVersion, ".", "_")
 
 #define SetupIni     "Setup.ini"
@@ -84,64 +84,58 @@ Source: "Files\Setup.ini"; DestDir: "{app}";
 Name: "custom"; Description: "Normal installation"; Flags: iscustom
 
 [Components]
-; TODO use idp comp
-Name: "VirtualBox"; Description: "VirtualBox";           Types: custom; ExtraDiskSpaceRequired: 177209344
-Name: "Vagrant";    Description: "Vagrant";              Types: custom; ExtraDiskSpaceRequired: 602931200
-Name: "ChefDK";     Description: "Chef Development Kit"; Types: custom; ExtraDiskSpaceRequired: 356515840
+Name: "VirtualBox"; Description: "VirtualBox";           Types: custom;
+Name: "Vagrant";    Description: "Vagrant";              Types: custom;
+Name: "ChefDK";     Description: "Chef Development Kit"; Types: custom;
 Name: "Cygwin";     Description: "cygwin";               Types: custom;
 
 [Code]
+var
+    DownloadDir: String;
 
+procedure ListUpSoftware();  forward;
 procedure InstallSoftware(); forward;
 
 procedure InitializeWizard;
 begin
     { extract setup.ini }
     ExtractTemporaryFile(ExpandConstant('{#SetupIni}'));
+    DownloadDir := '{tmp}';
 
     { create the custom pages }
     CreateProxyPage(wpInfoBefore);
 
-    { download starts set }
-    idpDownloadAfter(wpInstalling);
-    idpSetDetailedMode(True);
 end;
 
 procedure CurPageChanged(CurPageID: Integer);
-var
-    SoftName:     String;
-    DownloadUrl:  String;
-    SaveFileName: String;
 begin
+    if CurPageID = wpReady then
+    begin
+        { list up software to download }
+        ListUpSoftware;
+    end;
+
+    if CurPageID = wpPreparing then
+    begin
+        { set proxy to registry }
+        SetProxyToRegistry;
+
+        { download starts set }
+        idpDownloadAfter(wpPreparing);
+    end;
+
     if CurPageID = wpInstalling then
     begin
-        { reset file list }
-        idpClearFiles;
-
-        SoftName := 'VirtualBox';
-        if IsComponentSelected(Softname) then
-        begin
-            DownloadUrl  := GetIniString(SoftName, SoftName + 'DownloadUrl',  '', ExpandConstant('{tmp}\{#SetupIni}'));
-            SaveFileName := GetIniString(SoftName, SoftName + 'SaveFileName', '', ExpandConstant('{tmp}\{#SetupIni}'));
-            idpAddFile(DownloadUrl, ExpandConstant('{app}\') + SaveFileName);
-        end;
+        { install software }
+        InstallSoftware;
     end;
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
-var
-    SoftName:    String;
-    DownloadUrl: String;
-    SavedPath:   String;
 begin
     case CurStep of
         ssPostInstall:
         begin
-            { set proxy to registry }
-            SetProxyToRegistry;
-
-            InstallSoftware;
-
             //DelTree(ExpandConstant('{tmp}') + '\*', False, True, True);
         end;
     end;
@@ -159,17 +153,60 @@ end;
 
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
-    { Skip pages that shouldn't be shown }
     Result := False;
 end;
 
-procedure InstallSoftware();
+procedure ListUpSoftware;
 var
-  SoftwareName: String;
-  ExeFileName:  String;
-  Params:       String;
-  InstallDir:   String;
-  ResultCode:   Integer;
+    SoftNames:    array of String;
+    SoftName:     String;
+    DownloadUrl:  String;
+    SaveFileName: String;
+    i: Integer;
+begin
+    { reset file list }
+    idpClearFiles;
+
+    SetArrayLength(SoftNames, 3);
+    SoftNames[0] := 'VirtualBox';
+    SoftNames[1] := 'Vagrant';
+    SoftNames[2] := 'ChefDK';
+    { add download file list }
+    for i := 0 to 2 do
+    begin
+        SoftName := SoftNames[i];
+        if IsComponentSelected(Softname) then
+        begin
+            DownloadUrl  := GetIniString(SoftName, SoftName + 'DownloadUrl',  '', ExpandConstant('{tmp}\{#SetupIni}'));
+            SaveFileName := GetIniString(SoftName, SoftName + 'SaveFileName', '', ExpandConstant('{tmp}\{#SetupIni}'));
+            idpAddFile(DownloadUrl, ExpandConstant(DownloadDir) + '\' + SaveFileName);
+        end;
+    end;
+
+    if IsComponentSelected('Cygwin') then
+    begin
+        SoftName := 'Cygwin';
+
+        if IsWin64 then
+        begin
+            DownloadUrl  := GetIniString(SoftName, 'Cygwin64DownloadUrl',  '', ExpandConstant('{tmp}\{#SetupIni}'));
+        end else begin
+            DownloadUrl  := GetIniString(SoftName, 'Cygwin32DownloadUrl',  '', ExpandConstant('{tmp}\{#SetupIni}'));
+        end;
+
+        SaveFileName := GetIniString(SoftName, SoftName + 'SaveFileName', '', ExpandConstant('{tmp}\{#SetupIni}'));
+        idpAddFile(DownloadUrl, ExpandConstant(DownloadDir) + '\' + SaveFileName);
+    end;
+end;
+
+
+procedure InstallSoftware;
+var
+    SoftwareName: String;
+    ExeFileName:  String;
+    Params:       String;
+    InstallDir:   String;
+    ResultCode:   Integer;
 begin
     { prepare VirtualBox }
     if IsComponentSelected('VirtualBox') then
