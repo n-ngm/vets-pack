@@ -13,7 +13,7 @@
 ; Define MyApp Info
 #define MyPublisher  "ClickMaker"
 #define MyAppName    "Virtual Environment Installer Pack"
-#define MyAppVersion "0.1.10"
+#define MyAppVersion "0.1.12"
 #define MyOutputFile  StringChange(MyAppName, " ", "_") + "." + StringChange(MyAppVersion, ".", "_")
 
 #define SetupIni     "Setup.ini"
@@ -28,6 +28,7 @@
 #include "Src\Virtualbox.iss"
 #include "Src\Vagrant.iss"
 #include "Src\ChefDK.iss"
+#include "Src\Cygwin.iss"
 
 [Setup]
 AppName={#MyAppName}
@@ -224,6 +225,17 @@ begin
     if IsComponentSelected(SoftName) then
     begin
         ChefDK_Install(GetInstallerPath(SoftName));
+    end;
+
+    // install Cygwin
+    SoftName := 'Cygwin';
+    if IsComponentSelected(SoftName) then
+    begin
+        Cygwin_Install(GetInstallerPath(SoftName));
+        if Cygwin_Exists then
+        begin
+            Cygwin_PathSet;
+        end;
     end;
 end;
 
