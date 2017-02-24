@@ -5,9 +5,9 @@
 # (for Cygwin)
 #
 # e.g.
-# alias knife='C:/opscode/chefdk/bin/knife'
-# alias chef-client='C:/opscode/chefdk/bin/chef-client'
-# alias chef='C:/opscode/chefdk/bin/chef'
+# alias knife='/cygdrive/c/opscode/chefdk/embedded/bin/ruby C:/opscode/chefdk/bin/knife'
+# alias chef-client='/cygdrive/c/opscode/chefdk/embedded/bin/ruby C:/opscode/chefdk/bin/chef-client'
+# alias chef='/cygdrive/c/opscode/chefdk/embedded/bin/ruby C:/opscode/chefdk/bin/chef'
 #
 
 if [ ! -f /Cygwin.bat ]; then
@@ -19,6 +19,13 @@ CHEF_PATH=$(which chef)
 
 if [ ! $? = 0 ]; then
     echo 'chefdk may not be installed...'
+    exit
+fi
+
+RUBY_PATH=$(dirname $(dirname $CHEF_PATH))/embedded/bin/ruby
+
+if [ ! -f "$RUBY_PATH" ]; then
+    echo -e "not found ruby..."
     exit
 fi
 
@@ -55,12 +62,15 @@ convert_cyg2win ()
     find $(dirname $CHEF_PATH) -name '*.bat' | while read BAT; do
         CMD_PATH=$(convert_cyg2win $BAT)
         ALIAS=$(basename $CMD_PATH)
-        echo "alias $ALIAS='${CMD_PATH}'";
+        echo "alias $ALIAS='$RUBY_PATH $CMD_PATH'";
     done;
 
     # chef-zero
-    CMD_PATH=$(convert_cyg2win $(which chef-zero))
-    echo "alias chef-zero='${CMD_PATH}'";
+    ZERO_CMD=$(which chef-zero)
+    if [ $? = 0 ]; then
+        CMD_PATH=$(convert_cyg2win $ZERO_CMD)
+        echo "alias chef-zero='$RUBY_PATH $CMD_PATH'";
+    fi
 
     echo $BLOCK_END
 } >> $BASHRC
