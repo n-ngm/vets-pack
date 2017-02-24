@@ -1,5 +1,5 @@
 [Files]
-Source: "Files\CygwinAliasSet.sh"; DestDir: "{tmp}";
+Source: "Src\CygwinAliasSet.sh"; DestDir: "{tmp}";
 
 [Code]
 (**---------------------------
