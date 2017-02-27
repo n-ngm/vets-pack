@@ -13,7 +13,7 @@
 ; Define MyApp Info
 #define MyPublisher  "ClickMaker"
 #define MyAppName    "Virtual Environment Installer Pack"
-#define MyAppVersion "0.1.12"
+#define MyAppVersion "0.1.13"
 #define MyOutputFile  StringChange(MyAppName, " ", "_") + "." + StringChange(MyAppVersion, ".", "_")
 
 #define SetupIni     "Setup.ini"
@@ -111,7 +111,6 @@ begin
 
     { create the custom pages }
     CreateProxyPage(wpInfoBefore);
-
 end;
 
 procedure CurPageChanged(CurPageID: Integer);

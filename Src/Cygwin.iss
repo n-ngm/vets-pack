@@ -1,5 +1,6 @@
 [Files]
 Source: "Src\CygwinAliasSet.sh"; DestDir: "{tmp}";
+Source: "Src\chef-zero.bat"; DestDir: "{tmp}";
 
 [Code]
 (**---------------------------
@@ -67,12 +68,23 @@ begin
         RegAddEnvironment('Path', ExpandConstant(InstalledDir + '\bin'), ';');
 
         // set cdrive symbolyc link
-        Exec(InstalledDir + '\bin\bash', '-c "cd /; ln -swf /cygdrive/c c;"', '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
+        // Exec(InstalledDir + '\bin\run.exe', InstalledDir + '\bin\bash -l -c "ln -snf /cygdrive/c /c;"', '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
 
-        // set alias to use ruby commands in cygwin
-        ExtractTemporaryFile(ExpandConstant('CygwinAliasSet.sh'));
-        FileCopy(ExpandConstant('{tmp}\CygwinAliasSet.sh'), InstalledDir + '\tmp\CygwinAliasSet.sh', False);
-        Exec(InstalledDir + '\bin\bash', '/tmp/CygwinAliasSet.sh', '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
+        // set alias to use chef commands in cygwin
+        if Exec(ExpandConstant('{sys}\where.exe'), 'chef.bat', '', SW_SHOW, ewWaitUntilTerminated, ResultCode)  then
+        begin
+            if ResultCode = 0 then
+            begin
+                ExtractTemporaryFile(ExpandConstant('CygwinAliasSet.sh'));
+                FileCopy(ExpandConstant('{tmp}\CygwinAliasSet.sh'), InstalledDir + '\tmp\CygwinAliasSet.sh', False);
+
+                ExtractTemporaryFile(ExpandConstant('chef-zero.bat'));
+                FileCopy(ExpandConstant('{tmp}\chef-zero.bat'), InstalledDir + '\tmp\chef-zero.bat', False);
+
+                Exec(InstalledDir + '\bin\run.exe', InstalledDir + '\bin\bash -l /tmp/CygwinAliasSet.sh', '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
+
+            end;
+        end;
     end;
 end;
 

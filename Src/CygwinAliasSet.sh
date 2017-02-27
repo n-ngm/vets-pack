@@ -33,8 +33,8 @@ BLOCK_START='##Chef_Aliases_Block_Start'
 BLOCK_END='##Chef_Aliases_Block_End'
 BASHRC=/etc/bash.bashrc
 
-FIND_START=$(grep -e "$BLOCK_START" -n $BASHRC)
-FIND_END=$(grep -e "$BLOCK_END" -n $BASHRC)
+FIND_START=$(grep "$BLOCK_START" -n $BASHRC)
+FIND_END=$(grep "$BLOCK_END" -n $BASHRC)
 
 # delete block
 if [ ! -z "$FIND_START" -a ! -z "$FIND_END" ]; then
@@ -58,18 +58,35 @@ convert_cyg2win ()
 {
     echo $BLOCK_START
 
+    EXCLUDE_CMD=("chef-zero")
+
     # chef standard
     find $(dirname $CHEF_PATH) -name '*.bat' | while read BAT; do
         CMD_PATH=$(convert_cyg2win $BAT)
         ALIAS=$(basename $CMD_PATH)
-        echo "alias $ALIAS='$RUBY_PATH $CMD_PATH'";
-    done;
 
-    # chef-zero
-    ZERO_CMD=$(which chef-zero)
-    if [ $? = 0 ]; then
-        CMD_PATH=$(convert_cyg2win $ZERO_CMD)
-        echo "alias chef-zero='$RUBY_PATH $CMD_PATH'";
+        for EXCLUDE in ${EXCLUDE_CMD[@]};do
+            if [ "$ALIAS" = "$EXCLUDE" ]; then
+                continue 2
+            fi
+        done
+
+        echo "alias $ALIAS='$RUBY_PATH $CMD_PATH'"
+    done
+
+    ZERO_PATH=$(dirname $(dirname $CHEF_PATH))/embedded/bin/chef-zero
+
+    # chef-zero batch copy for dos-prompt
+    ZERO_ALT_BAT=$(dirname $0)/chef-zero.bat
+    if [ -f "$ZERO_PATH" -a -f "$ZERO_ALT_BAT" ]; then
+        cp $ZERO_ALT_BAT $(dirname $CHEF_PATH)/
+    fi
+
+    # chef-zero alias for cygwin
+    if [ -f "$ZERO_PATH" ]; then
+        CMD_PATH=$(convert_cyg2win $ZERO_PATH)
+        ALIAS=chef-zero
+        echo "alias $ALIAS='$RUBY_PATH $CMD_PATH'"
     fi
 
     echo $BLOCK_END
