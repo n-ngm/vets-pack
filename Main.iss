@@ -1,24 +1,27 @@
-; Installer of Virtual Environment Softwares 
+; Virtual Environment Tools Pack
 ;
-; Install 
+; this install virtual environment tools (virtualbox, vagrant, chefdk, cygwin) all at once,
+; for development in Windows.
+;
+; Install
 ;   - VirtualBox
 ;   - Vagrant
 ;   - ChefDK
 ;   - Cygwin
-; Set
-;   - Registery Proxy
-;   - Path
+; Set Registory
+;   - Proxy Setting
+;   - Envrionment Path
 ;
 
-; Define MyApp Info
+; define constants
 #define MyPublisher  "ClickMaker"
-#define MyAppName    "Virtual Environment Installer Pack"
+#define MyAppName    "Virtual Environment Tools Pack"
 #define MyAppVersion "0.1.13"
-#define MyOutputFile  StringChange(MyAppName, " ", "_") + "." + StringChange(MyAppVersion, ".", "_")
+#define MyOutputFile StringChange(MyAppName, " ", "") + "." + MyAppVersion
 
 #define SetupIni     "Setup.ini"
 
-; Include Inno-Setup Download Plugin
+; include InnoSetup download plugin
 #include <idp.iss>
 
 ; inclue sources
@@ -31,45 +34,31 @@
 #include "Src\Cygwin.iss"
 
 [Setup]
-AppName={#MyAppName}
-AppVerName={#MyAppName} {#MyAppVersion}
-AppPublisher={#MyPublisher}
-VersionInfoVersion={#MyAppVersion}
-OutputBaseFilename={#MyOutputFile}
+; setup basic info
+AppName            = {#MyAppName}
+AppVerName         = {#MyAppName} {#MyAppVersion}
+AppPublisher       = {#MyPublisher}
+VersionInfoVersion = {#MyAppVersion}
+OutputBaseFilename = {#MyOutputFile}
 
-; Enable Logging
-SetupLogging=yes
+; enable logging
+SetupLogging       = yes
 
-; Require Admin Execution
-PrivilegesRequired=admin
+; require admin execution
+PrivilegesRequired = admin
 
-; ------------- Inno-Setup Default Pages Setup
-; Select Language Dialog
-ShowLanguageDialog=yes
-
-; Show Welcome Page
-DisableWelcomePage=yes
-
-; Show License Page
-;LicenseFile=""
-
-; Show Password Page
-;Password=
-
-; Show Infomation Page
-;InfoBeforeFile=""
-
-; Show UserInfo Page
-UserInfoPage=no
-
-; Show Install Dir Page
-DisableDirPage=yes
-DefaultDirName={pf}\{#MyAppName}
-
-; Show Ready Page
-DisableReadyPage=no
-
-AppendDefaultDirName=no
+; default pages setting
+ShowLanguageDialog   = yes
+DisableWelcomePage   = yes
+LicenseFile          = ""
+Password             = ""
+InfoBeforeFile       = ""
+UserInfoPage         = no
+DisableDirPage       = yes
+DefaultDirName       = {pf}\{#MyPublisher}\{#emit StringChange(MyAppName, " ", "")}
+UsePreviousAppDir    = yes
+AppendDefaultDirName = no
+DisableReadyPage     = no
 
 
 [Languages]
@@ -199,10 +188,6 @@ end;
 procedure InstallSoftware;
 var
     SoftName:     String;
-    ExeFileName:  String;
-    Params:       String;
-    InstallDir:   String;
-    ResultCode:   Integer;
 begin
     // install VirtualBox
     SoftName := 'VirtualBox';
