@@ -64,14 +64,16 @@ DisableReadyPage     = no
 [Languages]
 Name: japanese; \
     MessagesFile: "compiler:\Languages\Japanese.isl,{__FILE__}\..\Messages\Japanese.isl"; \
-    InfoBeforeFile: "Files\Readme_JP.txt"
+    InfoBeforeFile: "Files\Readme_JP.md"
 
 Name: english; \
     MessagesFile: "compiler:Default.isl,{__FILE__}\..\Messages\English.isl"; \
-    InfoBeforeFile: "Readme.txt"
+    InfoBeforeFile: "Readme.md"
 
 [Files]
 Source: "Files\Setup.ini"; DestDir: "{app}";
+Source: "Readme.md"; DestDir: "{app}";
+Source: "Files\Readme_JP.md"; DestDir: "{app}";
 
 [Types]
 Name: "custom"; Description: {cm:NormalInstallation}; Flags: iscustom
