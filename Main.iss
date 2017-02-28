@@ -16,7 +16,7 @@
 ; define constants
 #define MyPublisher  "ClickMaker"
 #define MyAppName    "Virtual Environment Tools Pack"
-#define MyAppVersion "0.1.13"
+#define MyAppVersion "0.1.14"
 #define MyOutputFile StringChange(MyAppName, " ", "") + "." + MyAppVersion
 
 #define SetupIni     "Setup.ini"
@@ -64,11 +64,11 @@ DisableReadyPage     = no
 [Languages]
 Name: japanese; \
     MessagesFile: "compiler:\Languages\Japanese.isl,{__FILE__}\..\Messages\Japanese.isl"; \
-    InfoBeforeFile: "Files\README_JP.txt"
+    InfoBeforeFile: "Files\Readme_JP.txt"
 
 Name: english; \
     MessagesFile: "compiler:Default.isl,{__FILE__}\..\Messages\English.isl"; \
-    InfoBeforeFile: "Files\README.txt"
+    InfoBeforeFile: "Readme.txt"
 
 [Files]
 Source: "Files\Setup.ini"; DestDir: "{app}";
