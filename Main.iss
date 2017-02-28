@@ -85,14 +85,13 @@ Name: english; \
 Source: "Files\Setup.ini"; DestDir: "{app}";
 
 [Types]
-; Disable dropdown of installation type
-Name: "custom"; Description: "Normal installation"; Flags: iscustom
+Name: "custom"; Description: {cm:NormalInstallation}; Flags: iscustom
 
 [Components]
-Name: "VirtualBox"; Description: "VirtualBox";           Types: custom;
-Name: "Vagrant";    Description: "Vagrant";              Types: custom;
-Name: "ChefDK";     Description: "Chef Development Kit"; Types: custom;
-Name: "Cygwin";     Description: "cygwin";               Types: custom;
+Name: "VirtualBox"; Description: "VirtualBox";           Flags: disablenouninstallwarning;
+Name: "Vagrant";    Description: "Vagrant";              Flags: disablenouninstallwarning;
+Name: "ChefDK";     Description: "Chef Development Kit"; Flags: disablenouninstallwarning;
+Name: "Cygwin";     Description: "cygwin";               Flags: disablenouninstallwarning;
 
 [Code]
 var
