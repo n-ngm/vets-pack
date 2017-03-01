@@ -16,8 +16,8 @@
 ; define constants
 #define MyPublisher  "ClickMaker"
 #define MyAppName    "Virtual Environment Tools Pack"
-#define MyAppVersion "0.1.14"
-#define MyOutputFile StringChange(MyAppName, " ", "") + "." + MyAppVersion
+#define MyAppVersion "0.1.15"
+#define MyOutputFile StringChange(MyAppName, " ", "") + "-" + MyAppVersion
 
 #define SetupIni     "Setup.ini"
 

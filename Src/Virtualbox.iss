@@ -9,7 +9,7 @@
  *)
 function Virtualbox_Exists(): Boolean;
 begin
-    Result := RegKeyExists(HKEY_LOCAL_MACHINE, 'SOFTWARE\Oracle\VirtualBox');
+    Result := RegKeyExists(GetHKLM, 'SOFTWARE\Oracle\VirtualBox');
 end;
 
 (**

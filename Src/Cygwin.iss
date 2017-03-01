@@ -13,7 +13,7 @@ Source: "Src\chef-zero.bat"; DestDir: "{tmp}";
  *)
 function Cygwin_Exists(): Boolean;
 begin
-    Result := RegKeyExists(HKEY_LOCAL_MACHINE, 'SOFTWARE\Cygwin');
+    Result := RegKeyExists(GetHKLM, 'SOFTWARE\Cygwin');
 end;
 
 (**
@@ -61,7 +61,7 @@ var
     InstalledDir: String;
     ResultCode:   Integer;
 begin
-    if RegQueryStringValue(HKEY_LOCAL_MACHINE, 'SOFTWARE\Cygwin\setup', 'rootdir', InstalledDir) then
+    if RegQueryStringValue(GetHKLM, 'SOFTWARE\Cygwin\setup', 'rootdir', InstalledDir) then
     begin
         // set path to use cygwin command in ms-dos prompt
         RegAddEnvironment('Path', InstalledDir, ';');

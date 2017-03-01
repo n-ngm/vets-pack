@@ -7,6 +7,20 @@
 #define HKCU_NetKey "Software\Microsoft\Windows\CurrentVersion\Internet Settings"
 
 (**
+ * GetHKLM
+ *   Get HKEY_LOCAL_MACHINE RootKey by bit
+ *)
+function GetHKLM: Integer;
+begin
+    if IsWin64 then
+    begin
+        Result := HKLM64;
+    end else begin
+        Result := HKLM32;
+    end;
+end;
+
+(**
  * RegStringContained
  *   check if string is contained in string type registry
  *)
@@ -145,25 +159,26 @@ function RegWriteEnvironment(
     TargetKey:   String;
     TargetValue: String): Boolean;
 begin
-    Result := RegWriteStringValue(HKEY_LOCAL_MACHINE, '{#HKLM_EnvKey}', TargetKey,  TargetValue);
+    Result := RegWriteStringValue(GetHKLM, '{#HKLM_EnvKey}', TargetKey,  TargetValue);
 end;
 function RegDeleteEnvironment(
     TargetKey:   String): Boolean;
 begin
-    Result := RegDeleteValue(HKEY_LOCAL_MACHINE, '{#HKLM_EnvKey}', TargetKey);
+    Result := RegDeleteValue(GetHKLM, '{#HKLM_EnvKey}', TargetKey);
 end;
 function RegAddEnvironment(
     TargetKey:   String;
     TargetValue: String;
     Delimiter:   String): Boolean;
 begin
-    Result := RegAddStringValue(HKEY_LOCAL_MACHINE, '{#HKLM_EnvKey}', TargetKey,  TargetValue, Delimiter);
+    Result := RegAddStringValue(GetHKLM, '{#HKLM_EnvKey}', TargetKey,  TargetValue, Delimiter);
 end;
 function RegRemoveEnvironment(
     TargetKey:   String;
     TargetValue: String;
     Delimiter:   String): Boolean;
 begin
-    Result := RegRemoveStringValue(HKEY_LOCAL_MACHINE, '{#HKLM_EnvKey}', TargetKey,  TargetValue, Delimiter);
+    Result := RegRemoveStringValue(GetHKLM, '{#HKLM_EnvKey}', TargetKey,  TargetValue, Delimiter);
 end;
+
 
