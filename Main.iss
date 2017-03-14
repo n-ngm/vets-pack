@@ -16,8 +16,9 @@
 ; define constants
 #define MyPublisher  "ClickMaker"
 #define MyAppName    "Virtual Environment Tools Pack"
+#define MyAppAlias   "VETs Pack"
 #define MyAppVersion "0.1.15"
-#define MyOutputFile StringChange(MyAppName, " ", "") + "-" + MyAppVersion
+#define MyOutputFile StringChange(MyAppAlias, " ", "") + "-" + MyAppVersion
 
 #define SetupIni     "Setup.ini"
 
@@ -55,7 +56,7 @@ Password             = ""
 InfoBeforeFile       = ""
 UserInfoPage         = no
 DisableDirPage       = yes
-DefaultDirName       = {pf}\{#MyPublisher}\{#emit StringChange(MyAppName, " ", "")}
+DefaultDirName       = {pf}\{#MyPublisher}\{#emit StringChange(MyAppAlias, " ", "")}
 UsePreviousAppDir    = yes
 AppendDefaultDirName = no
 DisableReadyPage     = no
