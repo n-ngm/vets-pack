@@ -1,4 +1,9 @@
 [Code]
+procedure DebugBox(Message: String);
+begin
+    MsgBox(Message, mbInformation, MB_OK);
+end;
+
 function StrContain(SearchText: String; TargetText: String; Delimiter: String): Integer;
 begin
     Result := Pos(Delimiter + SearchText + Delimiter, Delimiter + TargetText + Delimiter);
@@ -42,3 +47,23 @@ begin
         WizardForm.ProgressGauge.Style := npbstNormal;
     end;
 end;
+
+function GetSetupValue(Section: String; Key: String; Default: String; AppSetupFirstIfExists: Boolean): String;
+var
+    SetupFilePath: String;
+begin
+    if (AppSetupFirstIfExists and FileExists(ExpandConstant('{app}/{#SetupIni}'))) then
+    begin
+        SetupFilePath := '{app}/{#SetupIni}';
+    end else begin
+        SetupFilePath := '{tmp}/{#SetupIni}';
+
+        if not FileExists(ExpandConstant('{tmp}/{#SetupIni}')) then
+        begin
+            ExtractTemporaryFile(ExpandConstant('{#SetupIni}'));
+        end;
+    end;
+
+    Result := GetIniString(Section, Key, Default, ExpandConstant(SetupFilePath));
+end;
+

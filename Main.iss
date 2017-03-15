@@ -15,10 +15,10 @@
 
 ; define constants
 #define MyPublisher  "ClickMaker"
-#define MyAppName    "Virtual Environment Tools Pack"
+#define MyAppName    "VETs (Virtual Environment Tools) Pack"
 #define MyAppAlias   "VETs Pack"
-#define MyAppVersion "0.1.15"
-#define MyOutputFile StringChange(MyAppAlias, " ", "") + "-" + MyAppVersion
+#define MyAppVersion "0.1.17"
+#define MyOutputFile StringChange(MyAppAlias, " ", "_") + "-" + MyAppVersion
 
 #define SetupIni     "Setup.ini"
 
@@ -29,6 +29,7 @@
 #include "Src\Common.iss"
 #include "Src\Registry.iss"
 #include "Src\ProxyPage.iss"
+#include "Src\CustomizePage.iss"
 #include "Src\Virtualbox.iss"
 #include "Src\Vagrant.iss"
 #include "Src\ChefDK.iss"
@@ -106,6 +107,12 @@ end;
 
 procedure CurPageChanged(CurPageID: Integer);
 begin
+    if CurPageID = wpSelectComponents then
+    begin
+        { create custom pages after selectdir. ( after app constant has defined ) }
+        CreateCustomizePage(wpSelectComponents);
+    end;
+
     if CurPageID = wpReady then
     begin
         { list up software to download }

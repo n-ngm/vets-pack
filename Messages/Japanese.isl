@@ -4,14 +4,15 @@ LanguageID=$0411
 
 
 [CustomMessages]
-HelloWorld=‚±‚ñ‚É‚¿‚í¢ŠE
-
 AppSimpleInfo=‰¼‘zŠÂ‹«\’zƒpƒbƒN
 
 NormalInstallation=’ÊíƒCƒ“ƒXƒg[ƒ‹
 
+SelectFolder=ƒtƒHƒ‹ƒ_‚ğ‘I‘ğ‚µ‚Ä‚­‚¾‚³‚¢
+Browse=‘I‘ğ
+
 ProxyPageTitle=ƒlƒbƒgƒ[ƒNİ’è
-ProxyPageDesc=ƒvƒƒLƒVİ’è‚ğs‚¢‚Ü‚·B
+ProxyPageDesc=ƒvƒƒLƒVİ’è‚ğs‚¢‚Ü‚·
 ProxyPageUseProxy=ƒvƒƒLƒV‚ğg—p‚·‚é
 ProxyPageProtocol=ƒvƒƒgƒRƒ‹
 ProxyPageAddress=ƒAƒhƒŒƒX
@@ -21,3 +22,8 @@ ProxyPageAddVmToNoProxy=—áŠOƒAƒhƒŒƒX‚É‰¼‘zŠÂ‹«Œü‚¯ƒAƒhƒŒƒX(*.local, *.vmhost)‚ğ’
 ProxyPageNotice=¦ ƒvƒƒLƒVİ’è‚ÌƒŒƒWƒXƒgƒŠ‚ğXV‚µ‚Ü‚·B
 
 
+CustomizePageTitle=ƒCƒ“ƒXƒg[ƒ‹İ’è
+CustomizePageDesc=ƒCƒ“ƒXƒg[ƒ‹İ’è‚ğs‚¢‚Ü‚·
+CustomizeAutoInstall=‘S‚Ä©“®‚ÅƒCƒ“ƒXƒg[ƒ‹‚·‚é
+CustomizeRemainInstaller=ŠeíƒCƒ“ƒXƒg[ƒ‰‚ğ•Û‘¶‚·‚é
+CustomizeInstallSample=ƒTƒ“ƒvƒ‹‚ğ•Û‘¶‚·‚é
