@@ -17,7 +17,7 @@
 #define MyPublisher  "ClickMaker"
 #define MyAppName    "VETs (Virtual Environment Tools) Pack"
 #define MyAppAlias   "VETs Pack"
-#define MyAppVersion "0.1.17"
+#define MyAppVersion "0.1.18"
 #define MyOutputFile StringChange(MyAppAlias, " ", "_") + "-" + MyAppVersion
 
 #define SetupIni     "Setup.ini"
@@ -87,9 +87,6 @@ Name: "ChefDK";     Description: "Chef Development Kit"; Flags: disablenouninsta
 Name: "Cygwin";     Description: "cygwin";               Flags: disablenouninstallwarning;
 
 [Code]
-var
-    DownloadDir: String;
-
 procedure ListUpSoftware;  forward;
 procedure InstallSoftware; forward;
 function  GetDownloadUrl  (SoftName: String): String; forward;
@@ -99,7 +96,6 @@ procedure InitializeWizard;
 begin
     { extract setup.ini }
     ExtractTemporaryFile(ExpandConstant('{#SetupIni}'));
-    DownloadDir := '{tmp}';
 
     { create the custom pages }
     CreateProxyPage(wpInfoBefore);
@@ -184,7 +180,10 @@ begin
         begin
             DownloadUrl   := GetDownloadUrl(SoftName);
             InstallerPath := GetInstallerPath(SoftName);
-            idpAddFile(DownloadUrl, InstallerPath);
+            if not FileExists(InstallerPath) then
+            begin
+                idpAddFile(DownloadUrl, InstallerPath);
+            end;
         end;
     end;
 
@@ -259,8 +258,17 @@ end;
  *)
 function GetInstallerPath(SoftName: String): String;
 var
+    DownloadDir: String;
     SaveFileName: String;
 begin
+    if CustomizeForms.RemainInstallerCheckBox.Checked then
+    begin
+        DownloadDir := CustomizeForms.RemainInstallerFileBox.Text;
+    end else begin
+        DownloadDir := '{tmp}';
+    end;
+
     SaveFileName := GetIniString(SoftName, SoftName + 'SaveFileName', '', ExpandConstant('{tmp}\{#SetupIni}'));
+
     Result := ExpandConstant(DownloadDir + '\' + SaveFileName);
 end;

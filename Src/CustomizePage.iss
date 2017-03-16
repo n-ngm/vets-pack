@@ -84,6 +84,7 @@ begin
         Left     := ScaleX(16);
         Width    := Page.SurfaceWidth - ScaleX(16 + 96);
         Text     := GetSetupValue('Customize', 'InstallerPath', ExpandConstant('{%USERPROFILE}\Downloads'), True);
+        ReadOnly := True;
     end;
 
     Forms.RemainInstallerButton := TNewButton.Create(Page);
@@ -119,6 +120,7 @@ begin
         Left     := ScaleX(16);
         Width    := Page.SurfaceWidth - ScaleX(16 + 96);
         Text     := GetSetupValue('Customize', 'SamplePath', ExpandConstant('{userdesktop}'), True);
+        ReadOnly := True;
     end;
 
     Forms.InstallSampleButton := TNewButton.Create(Page);
