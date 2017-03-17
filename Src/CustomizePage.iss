@@ -13,9 +13,9 @@ type TCustomizeForms = record
     RemainInstallerCheckBox:  TNewCheckBox;
     RemainInstallerFileBox:   TNewEdit;
     RemainInstallerButton:    TNewButton;
-    InstallSampleCheckBox:    TNewCheckBox;
-    InstallSampleFileBox:     TNewEdit;
-    InstallSampleButton:      TNewButton;
+    InstallExampleCheckBox:   TNewCheckBox;
+    InstallExampleFileBox:    TNewEdit;
+    InstallExampleButton:     TNewButton;
 end;
 
 (**
@@ -25,13 +25,14 @@ end;
 var
     CustomizePage  : TInputQueryWizardPage;
     CustomizeForms : TCustomizeForms;
+    ExampleDir     : String;
 
 (**
  * define hook method
  *)
 procedure ShowSelectFolderDialog(ReturnTo: TNewEdit); forward;
 procedure ShowRemainInstallerDialog(Sender: TObject); forward;
-procedure ShowInstallSampleDialog(Sender: TObject); forward;
+procedure ShowInstallExampleDialog(Sender: TObject); forward;
 
 (**
  * CreateCustomizePage
@@ -46,6 +47,8 @@ var
 begin
     // create page
     Page  := CreateInputQueryPage(AfterID, CustomMessage('CustomizePageTitle'), CustomMessage('CustomizePageDesc'), '');
+
+    ExampleDir := 'vets-examples';
 
     // create forms
     LineCount := 0;
@@ -99,36 +102,36 @@ begin
 
     LineCount := LineCount + 1;
 
-    Forms.InstallSampleCheckBox := TNewCheckBox.Create(Page);
-    with Forms.InstallSampleCheckBox do
+    Forms.InstallExampleCheckBox := TNewCheckBox.Create(Page);
+    with Forms.InstallExampleCheckBox do
     begin
         Parent   := Page.Surface;
         Checked  := True;
         Top      := ScaleY(16) + LineCount * LineHeight;
         Left     := 0;
         Width    := Page.SurfaceWidth
-        Caption  := CustomMessage('CustomizeInstallSample');
+        Caption  := CustomMessage('CustomizeInstallExample');
     end;
 
     LineCount := LineCount + 1;
 
-    Forms.InstallSampleFileBox := TNewEdit.Create(Page);
-    with Forms.InstallSampleFileBox do
+    Forms.InstallExampleFileBox := TNewEdit.Create(Page);
+    with Forms.InstallExampleFileBox do
     begin
         Parent   := Page.Surface;
         Top      := ScaleY(16) + LineCount * LineHeight;
         Left     := ScaleX(16);
         Width    := Page.SurfaceWidth - ScaleX(16 + 96);
-        Text     := GetSetupValue('Customize', 'SamplePath', ExpandConstant('{userdesktop}'), True);
+        Text     := GetSetupValue('Customize', 'ExamplePath', ExpandConstant('{userdesktop}\') + ExampleDir, True);
         ReadOnly := True;
     end;
 
-    Forms.InstallSampleButton := TNewButton.Create(Page);
-    with Forms.InstallSampleButton do
+    Forms.InstallExampleButton := TNewButton.Create(Page);
+    with Forms.InstallExampleButton do
     begin
         Parent   := Page.Surface;
         Top      := ScaleY(16) + LineCount * LineHeight - ScaleY(2);
-        Left     := Forms.InstallSampleFileBox.Left + Forms.InstallSampleFileBox.Width + ScaleX(4);
+        Left     := Forms.InstallExampleFileBox.Left + Forms.InstallExampleFileBox.Width + ScaleX(4);
         Width    := ScaleX(72);
         Caption  := CustomMessage('Browse');
     end;
@@ -141,7 +144,7 @@ begin
 
     // set onclick hook
     CustomizeForms.RemainInstallerButton.OnClick := @ShowRemainInstallerDialog;
-    CustomizeForms.InstallSampleButton.OnClick := @ShowInstallSampleDialog;
+    CustomizeForms.InstallExampleButton.OnClick  := @ShowInstallExampleDialog;
 end;
 
 (**
@@ -162,12 +165,26 @@ begin
         ReturnTo.Text := SelectDir;
     end;
 end;
+
 procedure ShowRemainInstallerDialog(Sender: TObject);
 begin
     ShowSelectFolderDialog(CustomizeForms.RemainInstallerFileBox);
 end;
-procedure ShowInstallSampleDialog(Sender: TObject);
+
+procedure ShowInstallExampleDialog(Sender: TObject);
+var
+    FileBox: TNewEdit;
+    BaseDir: String;
 begin
-    ShowSelectFolderDialog(CustomizeForms.InstallSampleFileBox);
+    FileBox := CustomizeForms.InstallExampleFileBox;
+    BaseDir := RegexReplace(FileBox.Text, '', '\\' + ExampleDir + '$', True)
+    FileBox.Text := BaseDir;
+
+    ShowSelectFolderDialog(FileBox);
+
+    if not RegexMatch(FileBox.Text, '\\' + ExampleDir + '$', True) then
+    begin
+        FileBox.Text := FileBox.Text + '\' + ExampleDir;
+    end;
 end;
 

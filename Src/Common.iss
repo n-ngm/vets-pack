@@ -4,6 +4,27 @@ begin
     MsgBox(Message, mbInformation, MB_OK);
 end;
 
+function RegexMatch(Target: String; Pattern: String; IgnoreCase: Boolean): Boolean;
+var
+    Regex: Variant;
+begin
+    Regex := CreateOleObject('VBScript.RegExp');
+    IDispatchInvoke(Regex, True, 'Pattern', [Pattern]);
+    IDispatchInvoke(Regex, True, 'IgnoreCase', [IgnoreCase]);
+    Result := IDispatchInvoke(Regex, False, 'Test', [Target]);
+end;
+
+function RegexReplace(Target: String; Replace: String; Pattern: String; IgnoreCase: Boolean): String;
+var
+    Regex: Variant;
+begin
+    Regex := CreateOleObject('VBScript.RegExp');
+    IDispatchInvoke(Regex, True, 'Pattern', [Pattern]);
+    IDispatchInvoke(Regex, True, 'IgnoreCase', [IgnoreCase]);
+    Result := IDispatchInvoke(Regex, False, 'Replace', [Target, Replace]);
+end;
+
+
 function StrContain(SearchText: String; TargetText: String; Delimiter: String): Integer;
 begin
     Result := Pos(Delimiter + SearchText + Delimiter, Delimiter + TargetText + Delimiter);

@@ -26,4 +26,4 @@ CustomizePageTitle=インストール設定
 CustomizePageDesc=インストール設定を行います
 CustomizeAutoInstall=全て自動でインストールする
 CustomizeRemainInstaller=各種インストーラを保存する
-CustomizeInstallSample=サンプルを保存する
+CustomizeInstallExample=サンプルを保存する
