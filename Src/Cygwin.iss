@@ -35,7 +35,10 @@ begin
     FileCopy(InstallerPath, ExecCommand, False);
 
     // quiet mode
-    // Params  := Params + ' -q';
+    if CustomizeForms.AutoInstallCheckBox.Checked then
+    begin
+       Params  := Params + ' -q ';
+    end;
 
     // proxy
     if ProxyForms.UseProxyCheckBox.Checked then

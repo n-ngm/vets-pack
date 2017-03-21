@@ -32,7 +32,13 @@ var
 begin
     SoftName    := 'Vagrant';
     ExecCommand := 'msiexec';
-    Params      := '/i ' + AddQuotes(InstallerPath) + ' /qf /norestart ALLUSERS=1';
+
+    Params      := '/i ' + AddQuotes(InstallerPath) + ' /norestart ALLUSERS=1';
+    if CustomizeForms.AutoInstallCheckBox.Checked then
+    begin
+        Params  := Params + ' /passive'
+    end;
+
     ExecOtherInstaller(SoftName, ExecCommand, Params);
 
     Vagrant_Exists();  // first initialized

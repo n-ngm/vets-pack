@@ -25,7 +25,7 @@ end;
 var
     CustomizePage  : TInputQueryWizardPage;
     CustomizeForms : TCustomizeForms;
-    ExampleDir     : String;
+    ExampleDirName : String;
 
 (**
  * define hook method
@@ -48,7 +48,7 @@ begin
     // create page
     Page  := CreateInputQueryPage(AfterID, CustomMessage('CustomizePageTitle'), CustomMessage('CustomizePageDesc'), '');
 
-    ExampleDir := 'vets-examples';
+    ExampleDirName := 'vets-examples';
 
     // create forms
     LineCount := 0;
@@ -106,7 +106,7 @@ begin
     with Forms.InstallExampleCheckBox do
     begin
         Parent   := Page.Surface;
-        Checked  := True;
+        Checked  := False;
         Top      := ScaleY(16) + LineCount * LineHeight;
         Left     := 0;
         Width    := Page.SurfaceWidth
@@ -122,7 +122,7 @@ begin
         Top      := ScaleY(16) + LineCount * LineHeight;
         Left     := ScaleX(16);
         Width    := Page.SurfaceWidth - ScaleX(16 + 96);
-        Text     := GetSetupValue('Customize', 'ExamplePath', ExpandConstant('{userdesktop}\') + ExampleDir, True);
+        Text     := GetSetupValue('Customize', 'ExamplePath', ExpandConstant('{userdesktop}\') + ExampleDirName, True);
         ReadOnly := True;
     end;
 
@@ -177,14 +177,14 @@ var
     BaseDir: String;
 begin
     FileBox := CustomizeForms.InstallExampleFileBox;
-    BaseDir := RegexReplace(FileBox.Text, '', '\\' + ExampleDir + '$', True)
+    BaseDir := RegexReplace(FileBox.Text, '', '\\' + ExampleDirName + '$', True)
     FileBox.Text := BaseDir;
 
     ShowSelectFolderDialog(FileBox);
 
-    if not RegexMatch(FileBox.Text, '\\' + ExampleDir + '$', True) then
+    if not RegexMatch(FileBox.Text, '\\' + ExampleDirName + '$', True) then
     begin
-        FileBox.Text := FileBox.Text + '\' + ExampleDir;
+        FileBox.Text := FileBox.Text + '\' + ExampleDirName;
     end;
 end;
 

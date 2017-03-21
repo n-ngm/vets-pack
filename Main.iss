@@ -17,7 +17,7 @@
 #define MyPublisher  "ClickMaker"
 #define MyAppName    "VETs (Virtual Environment Tools) Pack"
 #define MyAppAlias   "VETs Pack"
-#define MyAppVersion "0.1.18"
+#define MyAppVersion "0.1.20"
 #define MyOutputFile StringChange(MyAppAlias, " ", "_") + "-" + MyAppVersion
 
 #define SetupIni     "Setup.ini"
@@ -81,10 +81,10 @@ Source: "Files\Readme_JP.md"; DestDir: "{app}";
 Name: "custom"; Description: {cm:NormalInstallation}; Flags: iscustom
 
 [Components]
-Name: "VirtualBox"; Description: "VirtualBox";           Flags: disablenouninstallwarning;
-Name: "Vagrant";    Description: "Vagrant";              Flags: disablenouninstallwarning;
-Name: "ChefDK";     Description: "Chef Development Kit"; Flags: disablenouninstallwarning;
-Name: "Cygwin";     Description: "cygwin";               Flags: disablenouninstallwarning;
+Name: "VirtualBox"; Description: "VirtualBox";           Types: custom; Flags: disablenouninstallwarning;
+Name: "Vagrant";    Description: "Vagrant";              Types: custom; Flags: disablenouninstallwarning;
+Name: "ChefDK";     Description: "Chef Development Kit"; Types: custom; Flags: disablenouninstallwarning;
+Name: "Cygwin";     Description: "cygwin";               Types: custom; Flags: disablenouninstallwarning;
 
 [Code]
 procedure ListUpSoftware;  forward;
