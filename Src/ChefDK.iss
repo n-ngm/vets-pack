@@ -1,3 +1,6 @@
+[Files]
+Source: "Files\chef-zero.bat"; DestDir: "{tmp}";
+
 [Code]
 (**---------------------------
  * ChefDK functions
@@ -29,6 +32,7 @@ var
     SoftName:    String;
     ExecCommand: String;
     Params:      String;
+    InstalledDir: String;
 begin
     SoftName    := 'ChefDK';
     ExecCommand := 'msiexec';
@@ -39,4 +43,9 @@ begin
     end;
 
     ExecOtherInstaller(SoftName, ExecCommand, Params);
+
+    InstalledDir := GetWhichDir('chef.bat');
+    DebugBox(InstalledDir);
+    ExtractTemporaryFile(ExpandConstant('chef-zero.bat'));
+    FileCopy(ExpandConstant('{tmp}\chef-zero.bat'), InstalledDir + '\chef-zero.bat', False);
 end;

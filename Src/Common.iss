@@ -24,6 +24,30 @@ begin
     Result := IDispatchInvoke(Regex, False, 'Replace', [Target, Replace]);
 end;
 
+function GetWhichDir(CommandStr: String): String;
+var
+    TmpCommand: String;
+    TmpFile:    String;
+    ExecStdout: AnsiString;
+    ResultCode: Integer;
+begin
+    TmpCommand := CommandStr;
+    StringChangeEx(TmpCommand, '.', '_', True);
+
+    TmpFile := ExpandConstant('{tmp}\which-') + TmpCommand + '-result.txt';
+    SaveStringToFile(TmpFile, '', False);
+
+    Exec('cmd.exe', '/C where ' + CommandStr + ' > "' + TmpFile + '"', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    if LoadStringFromFile(TmpFile, ExecStdout) then
+    begin
+        Result := ExtractFileDir(ExecStdout);
+    end else begin
+        Result := '';
+    end;
+
+    DeleteFile(TmpFile);
+end;
+
 
 function StrContain(SearchText: String; TargetText: String; Delimiter: String): Integer;
 begin

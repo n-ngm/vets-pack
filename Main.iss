@@ -17,7 +17,7 @@
 #define MyPublisher  "ClickMaker"
 #define MyAppName    "VETs (Virtual Environment Tools) Pack"
 #define MyAppAlias   "VETs Pack"
-#define MyAppVersion "0.1.20"
+#define MyAppVersion "0.1.21"
 #define MyOutputFile StringChange(MyAppAlias, " ", "_") + "-" + MyAppVersion
 
 #define SetupIni     "Setup.ini"
@@ -66,7 +66,7 @@ DisableReadyPage     = no
 [Languages]
 Name: japanese; \
     MessagesFile: "compiler:\Languages\Japanese.isl,{__FILE__}\..\Messages\Japanese.isl"; \
-    InfoBeforeFile: "Files\Readme_JP.md"
+    InfoBeforeFile: "Readme_JP.md"
 
 Name: english; \
     MessagesFile: "compiler:Default.isl,{__FILE__}\..\Messages\English.isl"; \
@@ -75,7 +75,7 @@ Name: english; \
 [Files]
 Source: "Files\Setup.ini"; DestDir: "{app}";
 Source: "Readme.md"; DestDir: "{app}";
-Source: "Files\Readme_JP.md"; DestDir: "{app}";
+Source: "Readme_JP.md"; DestDir: "{app}";
 
 [Types]
 Name: "custom"; Description: {cm:NormalInstallation}; Flags: iscustom

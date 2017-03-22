@@ -1,6 +1,5 @@
 [Files]
-Source: "Src\CygwinAliasSet.sh"; DestDir: "{tmp}";
-Source: "Src\chef-zero.bat"; DestDir: "{tmp}";
+Source: "Files\chef-alias-set.sh"; DestDir: "{tmp}";
 
 [Code]
 (**---------------------------
@@ -78,13 +77,10 @@ begin
         begin
             if ResultCode = 0 then
             begin
-                ExtractTemporaryFile(ExpandConstant('CygwinAliasSet.sh'));
-                FileCopy(ExpandConstant('{tmp}\CygwinAliasSet.sh'), InstalledDir + '\tmp\CygwinAliasSet.sh', False);
+                ExtractTemporaryFile(ExpandConstant('chef-alias-set.sh'));
+                FileCopy(ExpandConstant('{tmp}\chef-alias-set.sh'), InstalledDir + '\tmp\chef-alias-set.sh', False);
 
-                ExtractTemporaryFile(ExpandConstant('chef-zero.bat'));
-                FileCopy(ExpandConstant('{tmp}\chef-zero.bat'), InstalledDir + '\tmp\chef-zero.bat', False);
-
-                Exec(InstalledDir + '\bin\run.exe', InstalledDir + '\bin\bash -l /tmp/CygwinAliasSet.sh', '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
+                Exec(InstalledDir + '\bin\run.exe', InstalledDir + '\bin\bash -l /tmp/chef-alias-set.sh', '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
 
             end;
         end;
