@@ -1,8 +1,34 @@
 [Code]
+var
+    SoftNames: Array of String;
+
+{ define software names }
+procedure DefineSoftNames;
+begin
+    SetArrayLength(SoftNames, 4);
+    SoftNames[0] := 'VirtualBox';
+    SoftNames[1] := 'Vagrant';
+    SoftNames[2] := 'ChefDK';
+    SoftNames[3] := 'Cygwin';
+end;
+
 procedure DebugBox(Message: String);
 begin
     MsgBox(Message, mbInformation, MB_OK);
 end;
+
+function BoolToStr(Value: Boolean): String;
+begin
+    if Value then
+    begin
+        Result := 'True'
+    end else begin
+        Result := 'False';
+    end;
+end;
+
+{ duplicate idp.iss }
+// function StrToBool(Value: String): Boolean;
 
 function RegexMatch(Target: String; Pattern: String; IgnoreCase: Boolean): Boolean;
 var
@@ -48,29 +74,6 @@ begin
     DeleteFile(TmpFile);
 end;
 
-
-function StrContain(SearchText: String; TargetText: String; Delimiter: String): Integer;
-begin
-    Result := Pos(Delimiter + SearchText + Delimiter, Delimiter + TargetText + Delimiter);
-end;
-
-function GetInstallerSavedPath(FileName: String): String;
-begin
-    Result := ExpandConstant('{app}') + '\' + ExpandConstant(FileName);
-end;
-
-procedure DownloadFile(Url: String; FileName: String; AfterID: Integer);
-var
-    SavePath: String;
-begin
-    SavePath := GetInstallerSavedPath(FileName);
-    if not FileExists(SavePath) then
-    begin
-        idpAddFile(Url, ExpandConstant(SavePath));
-        idpDownloadAfter(AfterID);
-    end;
-end;
-
 function ExecOtherInstaller(SoftName: String; ExecCommand: String; Params: String): Boolean;
 var
     StatusText: String;
@@ -93,22 +96,25 @@ begin
     end;
 end;
 
-function GetSetupValue(Section: String; Key: String; Default: String; AppSetupFirstIfExists: Boolean): String;
+function GetSetupIniValue(Section: String; Key: String; Default: String; AppSetupFirstIfExists: Boolean): String;
 var
     SetupFilePath: String;
 begin
-    if (AppSetupFirstIfExists and FileExists(ExpandConstant('{app}/{#SetupIni}'))) then
+    if (AppSetupFirstIfExists and FileExists(ExpandConstant('{app}/Setup.ini'))) then
     begin
-        SetupFilePath := '{app}/{#SetupIni}';
+        SetupFilePath := '{app}/Setup.ini';
     end else begin
-        SetupFilePath := '{tmp}/{#SetupIni}';
-
-        if not FileExists(ExpandConstant('{tmp}/{#SetupIni}')) then
-        begin
-            ExtractTemporaryFile(ExpandConstant('{#SetupIni}'));
-        end;
+        SetupFilePath := '{tmp}/Setup.ini';
     end;
 
     Result := GetIniString(Section, Key, Default, ExpandConstant(SetupFilePath));
 end;
 
+function SetSetupIniValue(Section: String; Key: String; Value: String): Boolean;
+var
+    SetupFilePath: String;
+begin
+    SetupFilePath := '{tmp}/Setup.ini';
+
+    Result := SetIniString(Section, Key, Value, ExpandConstant(SetupFilePath));
+end;

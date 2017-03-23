@@ -49,7 +49,7 @@ begin
     Params := Params + ' -P "rsync,openssh"';
 
     // repository
-    Params := Params + ' -s ' + GetIniString(SoftName, SoftName + 'RepositoryUrl', '', ExpandConstant('{tmp}\{#SetupIni}'));
+    Params := Params + ' -s ' + GetIniString(SoftName, SoftName + 'RepositoryUrl', '', ExpandConstant('{tmp}\Setup.ini'));
 
     // local pacakge dir
     // Params := Params + ' -l "' +  LocalRoot  + '"';
@@ -73,16 +73,12 @@ begin
         // Exec(InstalledDir + '\bin\run.exe', InstalledDir + '\bin\bash -l -c "ln -snf /cygdrive/c /c;"', '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
 
         // set alias to use chef commands in cygwin
-        if Exec(ExpandConstant('{sys}\where.exe'), 'chef.bat', '', SW_SHOW, ewWaitUntilTerminated, ResultCode)  then
+        if ChefDK_Exists then
         begin
-            if ResultCode = 0 then
-            begin
-                ExtractTemporaryFile(ExpandConstant('chef-alias-set.sh'));
-                FileCopy(ExpandConstant('{tmp}\chef-alias-set.sh'), InstalledDir + '\tmp\chef-alias-set.sh', False);
+            ExtractTemporaryFile(ExpandConstant('chef-alias-set.sh'));
+            FileCopy(ExpandConstant('{tmp}\chef-alias-set.sh'), InstalledDir + '\tmp\chef-alias-set.sh', False);
 
-                Exec(InstalledDir + '\bin\run.exe', InstalledDir + '\bin\bash -l /tmp/chef-alias-set.sh', '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
-
-            end;
+            Exec(InstalledDir + '\bin\run.exe', InstalledDir + '\bin\bash -l /tmp/chef-alias-set.sh', '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
         end;
     end;
 end;

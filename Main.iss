@@ -17,10 +17,8 @@
 #define MyPublisher  "ClickMaker"
 #define MyAppName    "VETs (Virtual Environment Tools) Pack"
 #define MyAppAlias   "VETs Pack"
-#define MyAppVersion "0.1.21"
+#define MyAppVersion "0.1.22"
 #define MyOutputFile StringChange(MyAppAlias, " ", "_") + "-" + MyAppVersion
-
-#define SetupIni     "Setup.ini"
 
 ; include InnoSetup download plugin
 #include <idp.iss>
@@ -73,9 +71,9 @@ Name: english; \
     InfoBeforeFile: "Readme.md"
 
 [Files]
-Source: "Files\Setup.ini"; DestDir: "{app}";
-Source: "Readme.md"; DestDir: "{app}";
-Source: "Readme_JP.md"; DestDir: "{app}";
+Source: "Files\Setup.ini"; DestDir: "{tmp}"; Flags: dontcopy
+Source: "Readme.md";       DestDir: "{app}";
+Source: "Readme_JP.md";    DestDir: "{app}";
 
 [Types]
 Name: "custom"; Description: {cm:NormalInstallation}; Flags: iscustom
@@ -93,11 +91,16 @@ function  GetDownloadUrl  (SoftName: String): String; forward;
 function  GetInstallerPath(SoftName: String): String; forward;
 
 procedure InitializeWizard;
+var
+    RegPath:      String;
 begin
-    { extract setup.ini }
-    ExtractTemporaryFile(ExpandConstant('{#SetupIni}'));
+    { define software names }
+    DefineSoftNames;
 
-    { create the custom pages }
+    { extract setup.ini }
+    ExtractTemporaryFile('Setup.ini');
+
+{ create the custom pages }
     CreateProxyPage(wpInfoBefore);
 end;
 
@@ -121,13 +124,20 @@ begin
         SetProxyToRegistry;
 
         { download starts set }
-        idpDownloadAfter(wpPreparing);
+    //    idpDownloadAfter(wpPreparing);
     end;
 
     if CurPageID = wpInstalling then
     begin
         { install software }
-        InstallSoftware;
+    //    InstallSoftware;
+    end;
+
+    if CurPageID = wpFinished then
+    begin
+        SaveProxyPage;
+        SaveCustomizePage;
+        FileCopy(ExpandConstant('{tmp}\Setup.ini'), ExpandConstant('{app}\Setup.ini'), False);
     end;
 end;
 
@@ -158,7 +168,6 @@ end;
 
 procedure ListUpSoftware;
 var
-    SoftNames:     array of String;
     SoftName:      String;
     DownloadUrl:   String;
     InstallerPath: String;
@@ -167,13 +176,8 @@ begin
     { reset file list }
     idpClearFiles;
 
-    SetArrayLength(SoftNames, 4);
-    SoftNames[0] := 'VirtualBox';
-    SoftNames[1] := 'Vagrant';
-    SoftNames[2] := 'ChefDK';
-    SoftNames[3] := 'Cygwin';
     { add download file list }
-    for i := 0 to 3 do
+    for i := 0 to (GetArrayLength(SoftNames) - 1) do
     begin
         SoftName := SoftNames[i];
         if IsComponentSelected(SoftName) then
@@ -186,7 +190,6 @@ begin
             end;
         end;
     end;
-
 end;
 
 
@@ -249,7 +252,7 @@ begin
             Bit := '32';
         end;
     end;
-    Result := GetIniString(SoftName, SoftName + Bit + 'DownloadUrl',  '', ExpandConstant('{tmp}\{#SetupIni}'));
+    Result := GetIniString(SoftName, SoftName + Bit + 'DownloadUrl',  '', ExpandConstant('{tmp}\Setup.ini'));
 end;
 
 (**
@@ -263,12 +266,12 @@ var
 begin
     if CustomizeForms.RemainInstallerCheckBox.Checked then
     begin
-        DownloadDir := CustomizeForms.RemainInstallerFileBox.Text;
+        DownloadDir := CustomizeForms.RemainInstallerTextBox.Text;
     end else begin
         DownloadDir := '{tmp}';
     end;
 
-    SaveFileName := GetIniString(SoftName, SoftName + 'SaveFileName', '', ExpandConstant('{tmp}\{#SetupIni}'));
+    SaveFileName := RegexReplace(GetDownloadUrl(SoftName), '$1', '.*/([\w._-]+)$', True);
 
     Result := ExpandConstant(DownloadDir + '\' + SaveFileName);
 end;

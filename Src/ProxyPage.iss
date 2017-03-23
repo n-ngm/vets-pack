@@ -11,13 +11,17 @@
  *)
 type TProxyForms = record
     UseProxyCheckBox:     TNewCheckBox;
+
     ProxyProtocolLabel1:  TNewStaticText;
     ProxyProtocolTextBox: TNewEdit;
     ProxyProtocolLabel2:  TNewStaticText;
+
     ProxyAddressLabel:    TNewStaticText;
     ProxyAddressTextBox:  TNewEdit;
+
     ProxyPortLabel:       TNewStaticText;
     ProxyPortTextBox:     TNewEdit;
+
     AddLocalCheckBox:     TNewCheckBox;
     AddVmCheckBox:        TNewCheckBox;
     ProxyNotice:          TNewStaticText;
@@ -319,4 +323,13 @@ begin
     end else begin
         RegWriteDwordValue (HKEY_CURRENT_USER, '{#HKCU_NetKey}', 'ProxyEnable', 0);
     end;
+end;
+
+(**
+ * SaveProxyPage
+ *   save values in proxy page to setup.ini
+ *)
+procedure SaveProxyPage;
+begin
+
 end;
